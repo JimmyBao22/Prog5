@@ -14,8 +14,7 @@ public class GameManager implements BoggleGame {
     private char[][] board;
     private int[] scores;
     private SearchTactic searchTactic;
-    private HashSet<String> allWords;
-    private HashSet<String>[] playerWords;
+    private HashSet<String> allWords, usedWords;
     private List<Point> lastWord;
 
     @Override
@@ -36,10 +35,7 @@ public class GameManager implements BoggleGame {
         board = new char[size][size];
         scores = new int[numPlayers];
         allWords = new HashSet<String>();
-        playerWords = new HashSet[numPlayers];
-        for (int i = 0; i < numPlayers; i++) {
-            playerWords[i] = new HashSet<String>();
-        }
+        usedWords = new HashSet<String>();
         lastWord = null;
 
     }
@@ -51,8 +47,8 @@ public class GameManager implements BoggleGame {
 
     @Override
     public int addWord(String word, int player) {
-        if (allWords.contains(word) && !playerWords[player-1].contains(word)) {
-            playerWords[player-1].add(word);
+        if (allWords.contains(word) && !usedWords.contains(word)) {
+            usedWords.add(word);
             return word.length();
         } else {
             return 0;

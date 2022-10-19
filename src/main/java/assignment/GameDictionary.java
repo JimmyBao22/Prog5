@@ -35,22 +35,7 @@ public class GameDictionary implements BoggleDictionary {
 
     @Override
     public boolean contains(String word) {
-        int min = 0;
-        int max = words.size() - 1;
-        while (min < max) {
-            int middle = (min + max) / 2;
-            int value = word.compareTo(words.get(middle));
-            if (value == 0) {
-                // found the word
-                return true;
-            } else if (value < 0) {
-                // current word is lexicographically smaller than words.get(middle)
-                min = middle + 1;
-            } else {
-                // value > 0, current word is lexicographically larger than words.get(middle)
-                max = middle - 1;
-            }
-        }
+
         return false;
     }
 
