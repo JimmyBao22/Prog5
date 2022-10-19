@@ -1,15 +1,19 @@
 package assignment;
 
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 
 public class GameManager implements BoggleGame {
 
     private int size, numPlayers;
     private String cubeFile;
+    private String[] cubeStrings;
     private BoggleDictionary dict;
     private char[][] board;
     private int[] scores;
@@ -30,7 +34,16 @@ public class GameManager implements BoggleGame {
             throw new IllegalArgumentException("number of players is less than 0");
         }
 
-        // TODO check that cubefile is a correct file
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(cubeFile));
+            cubeStrings = new String[size * size];
+            for (int i = 0; i < cubeStrings.length; i++) {
+                cubeStrings[i] = reader.readLine();
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading instruction file: " + e.getMessage());
+            return;
+        }
 
         board = new char[size][size];
         scores = new int[numPlayers];
@@ -38,6 +51,7 @@ public class GameManager implements BoggleGame {
         usedWords = new HashSet<String>();
         lastWord = null;
 
+        setGame(board);
     }
 
     @Override
@@ -62,7 +76,23 @@ public class GameManager implements BoggleGame {
 
     @Override
     public void setGame(char[][] board) {
+        shuffle();
+        for (int i = 0; i < cubeStrings.length; i++) {
+            int index = (int)(Math.random() * cubeStrings[i].length());
+            board[i / size][i % size] = cubeStrings[i].charAt(index);
+        }
+    }
 
+    private void shuffle() {
+        Random ordering = new Random();
+        for (int i = 0; i < cubeStrings.length; i++) {
+            int switchIndex = ordering.nextInt(cubeStrings.length);
+
+            // swap the strings at indices i and switch index
+            String temp = cubeStrings[i];
+            cubeStrings[i] = cubeStrings[switchIndex];
+            cubeStrings[switchIndex] = temp;
+        }
     }
 
     @Override

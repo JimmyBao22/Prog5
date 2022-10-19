@@ -25,7 +25,7 @@ public class GameDictionary implements BoggleDictionary {
                 words.add(word);
             }
         } catch(IOException e) {
-            // TODO
+            System.err.println("Error reading instruction file: " + e.getMessage());
         }
     }
 
