@@ -98,10 +98,8 @@ public class GameManager implements BoggleGame {
     @Override
     public Collection<String> getAllWords() {
         Collection<String> words = new HashSet<String>();
-        if (searchTactic.equals(SEARCH_DEFAULT)) {
-
-        } else if (searchTactic.equals(SearchTactic.SEARCH_BOARD)) {
-
+        if (searchTactic.equals(SearchTactic.SEARCH_BOARD)) {
+            
         } else if (searchTactic.equals(SearchTactic.SEARCH_DICT)) {
 
         } else {
