@@ -56,11 +56,18 @@ public class GameManager implements BoggleGame {
 
     @Override
     public char[][] getBoard() {
+        if (board == null) {
+            System.err.println("No game created");
+        }
         return board;
     }
 
     @Override
     public int addWord(String word, int player) {
+        if (allWords == null) {
+            System.err.println("No game created");
+            return -1;
+        }
         if (allWords.contains(word) && !usedWords.contains(word)) {
             usedWords.add(word);
             return word.length();
@@ -71,11 +78,23 @@ public class GameManager implements BoggleGame {
 
     @Override
     public List<Point> getLastAddedWord() {
+        if (lastWord == null) {
+            System.err.println("No game created");
+        }
         return lastWord;
     }
 
     @Override
     public void setGame(char[][] board) {
+        if (cubeStrings == null) {
+            System.err.println("No game created");
+            return;
+        }
+        if (size * size != cubeStrings.length) {
+            throw new IllegalArgumentException("Invalid input for the amount of cubes");
+        }
+
+        // TODO, based on piazza post if there are jagged grids, update this
         shuffle();
         for (int i = 0; i < cubeStrings.length; i++) {
             int index = (int)(Math.random() * cubeStrings[i].length());
@@ -97,9 +116,13 @@ public class GameManager implements BoggleGame {
 
     @Override
     public Collection<String> getAllWords() {
+        if (board == null) {
+            System.err.println("No game created");
+            return null;
+        }
         Collection<String> words = new HashSet<String>();
         if (searchTactic.equals(SearchTactic.SEARCH_BOARD)) {
-            
+
         } else if (searchTactic.equals(SearchTactic.SEARCH_DICT)) {
 
         } else {
@@ -116,6 +139,9 @@ public class GameManager implements BoggleGame {
 
     @Override
     public int[] getScores() {
+        if (scores == null) {
+            System.err.println("No game created");
+        }
         return scores;
     }
 }

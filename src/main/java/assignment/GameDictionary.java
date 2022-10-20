@@ -22,6 +22,8 @@ public class GameDictionary implements BoggleDictionary {
             BufferedReader reader = new BufferedReader(new FileReader(fileName));
             String word = "";
             while ((word = reader.readLine()) != null) {
+                word = word.trim();
+                word = word.toLowerCase();
                 words.add(word);
             }
         } catch(IOException e) {
@@ -31,16 +33,28 @@ public class GameDictionary implements BoggleDictionary {
 
     @Override
     public boolean isPrefix(String prefix) {
+        if (words == null) {
+            System.err.println("No loaded dictionary");
+            return false;
+        }
         return words.hasPrefix(prefix);
     }
 
     @Override
     public boolean contains(String word) {
+        if (words == null) {
+            System.err.println("No loaded dictionary");
+            return false;
+        }
         return words.contains(word);
     }
 
     @Override
     public Iterator<String> iterator() {
+        if (words == null) {
+            System.err.println("No loaded dictionary");
+            return null;
+        }
         return words.iterator();
     }
 }
