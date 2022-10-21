@@ -9,21 +9,22 @@ import java.util.Iterator;
 import java.util.List;
 
 public class GameDictionary implements BoggleDictionary {
-
     private String fileName;
     private Trie words;
 
     @Override
     public void loadDictionary(String filename) throws IOException {
         fileName = filename;
-
         words = new Trie();
+
         try {
             BufferedReader reader = new BufferedReader(new FileReader(fileName));
             String word = "";
             while ((word = reader.readLine()) != null) {
+                // remove excess whitespace and move to lowercase
                 word = word.trim();
                 word = word.toLowerCase();
+
                 words.add(word);
             }
         } catch(IOException e) {
@@ -37,6 +38,7 @@ public class GameDictionary implements BoggleDictionary {
             System.err.println("No loaded dictionary");
             return false;
         }
+
         return words.hasPrefix(prefix);
     }
 
@@ -46,6 +48,7 @@ public class GameDictionary implements BoggleDictionary {
             System.err.println("No loaded dictionary");
             return false;
         }
+
         return words.contains(word);
     }
 
@@ -55,6 +58,7 @@ public class GameDictionary implements BoggleDictionary {
             System.err.println("No loaded dictionary");
             return null;
         }
+
         return words.iterator();
     }
 }

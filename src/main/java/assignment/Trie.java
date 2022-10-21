@@ -19,6 +19,7 @@ public class Trie implements Iterable<String> {
             next();
         }
 
+        // return whether we have yet to iterate over all words
         public boolean hasNext() {
             // currNode is only null if we have reached the end
             return currNode != null;

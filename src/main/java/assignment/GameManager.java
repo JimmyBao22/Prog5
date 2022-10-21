@@ -58,6 +58,7 @@ public class GameManager implements BoggleGame {
         if (board == null) {
             System.err.println("No game created");
         }
+
         return board;
     }
 
@@ -67,6 +68,7 @@ public class GameManager implements BoggleGame {
             System.err.println("No game created");
             return -1;
         }
+
         // TODO update last word
         if (allWords.containsKey(word) && !usedWords.contains(word)) {
             usedWords.add(word);
@@ -103,9 +105,10 @@ public class GameManager implements BoggleGame {
     }
 
     private void shuffle() {
-        Random ordering = new Random();
+        Random rand = new Random();
+
         for (int i = 0; i < cubeStrings.length; i++) {
-            int switchIndex = ordering.nextInt(cubeStrings.length);
+            int switchIndex = rand.nextInt(cubeStrings.length);
 
             // swap the strings at indices i and switch index
             String temp = cubeStrings[i];
@@ -120,6 +123,7 @@ public class GameManager implements BoggleGame {
             System.err.println("No game created");
             return null;
         }
+
         Collection<String> words = new HashSet<String>();
         if (searchTactic.equals(SearchTactic.SEARCH_BOARD)) {
             searchBoard(words);
@@ -135,6 +139,7 @@ public class GameManager implements BoggleGame {
     private void searchBoard (Collection<String> words) {
         // TODO: can we use a regular queue instead of deque?
         // can we break this method into smaller pieces? would improve readability
+        // can we use (custom) int based points instead of AWT double based ones?
 
 
         ArrayDeque<WordPoints> deque = new ArrayDeque<WordPoints>();
@@ -157,21 +162,20 @@ public class GameManager implements BoggleGame {
             int y = (int)(previousPosition.getY());
 
             // attempt go in all four directions
+            int[][] delta = new int[][] {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+            for (int i = 0; i < delta.length; i++) {
+                int updatedX = x + delta[i][0];
+                int updatedY = y + delta[i][1];
 
-            int[] rowUpdate = new int[] {1, -1, 0, 0};
-            int[] columnUpdate = new int[] {0, 0, 1, -1};
-            for (int i = 0; i < rowUpdate.length; i++) {
-                int updatedX = x + rowUpdate[i];
-                int updatedY = y + columnUpdate[i];
                 if (!outOfBounds(updatedX, updatedY)) {
                     String updatedWord = currentWord + board[updatedX][updatedY];
                     // if the current word is a word
                     if (updatedWord.length() >= 4 && !words.contains(updatedWord) && dict.contains(updatedWord)) {
-                        // dictionary contains the word
+                        // dictionary contains the word, we should mark it
                         words.add(updatedWord);
                         updateDeque(deque, currentPoints, updatedX, updatedY, updatedWord);
                     } else if (dict.isPrefix(updatedWord)) {
-                        // can go to this position
+                        // we should continue exploring this path
                         updateDeque(deque, currentPoints, updatedX, updatedY, updatedWord);
                     }
                 }
@@ -180,8 +184,7 @@ public class GameManager implements BoggleGame {
     }
 
     private void updateDeque(ArrayDeque<WordPoints> deque, List<Point> currentPoints, int updatedX, int updatedY, String updatedWord) {
-        List<Point> updatedPoints = new ArrayList<Point>();
-        updatedPoints.addAll(currentPoints);
+        List<Point> updatedPoints = new ArrayList<Point>(currentPoints);
         updatedPoints.add(new Point(updatedX, updatedY));
         deque.add(new WordPoints(updatedWord, updatedPoints));
     }
@@ -223,6 +226,7 @@ public class GameManager implements BoggleGame {
         if (scores == null) {
             System.err.println("No game created");
         }
+
         return scores;
     }
 }
