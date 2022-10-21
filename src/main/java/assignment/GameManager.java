@@ -133,6 +133,10 @@ public class GameManager implements BoggleGame {
     }
 
     private void searchBoard (Collection<String> words) {
+        // TODO: can we use a regular queue instead of deque?
+        // can we break this method into smaller pieces? would improve readability
+
+
         ArrayDeque<WordPoints> deque = new ArrayDeque<WordPoints>();
         // push every letter in the board
         for (int i = 0; i < board.length; i++) {

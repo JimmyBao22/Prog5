@@ -5,17 +5,22 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Trie implements Iterable<String> {
+    // represents an iterator through the trie
     private class TrieIterator implements Iterator<String> {
         // track which node we are in the trie
          TrieNode currNode;
+         // store the letters in the current word
          StringBuilder currWord;
         public TrieIterator(TrieNode root) {
+            // start at the root with an empty string
             currWord = new StringBuilder();
             currNode = root;
+            // find the first word and initialize currWord/currNode to appropriate values
             next();
         }
 
         public boolean hasNext() {
+            // currNode is only null if we have reached the end
             return currNode != null;
         }
 
@@ -24,23 +29,24 @@ public class Trie implements Iterable<String> {
             TrieNode prevChild = currNode;
             currNode = currNode.getParent();
 
-            // remove the last letter because we stepped back
-            currWord.deleteCharAt(currWord.length() - 1);
-
+            // if the parent is null, we have gone above the root, so there are no more words
             if (currNode == null) {
                 return;
             }
 
-            // if prevChild is the last child of currNode, stepBack
+            // remove the last letter because we stepped up one level (out of prevChild)
+            currWord.deleteCharAt(currWord.length() - 1);
+
+            // if prevChild is the last child of currNode, stepBack so we can look up another level for more children
             if (currNode.getChild(currNode.numChildren() - 1).equals(prevChild)) {
                 stepBack();
             } else {
-                // set currNode to the next child of currNode after prevChild
+                // set currNode to the next child of the parent after prevChild
                 currNode = currNode.getChild(currNode.getIndexOf(prevChild) + 1);
                 // add the letter of the next child to current word
-                currWord.append((char) ('A' + currNode.getLetter()));
+                currWord.append(currNode.getLetter());
 
-                // keep going in until we reach a word
+                // keep going into the first child until we reach a word
                 while (!currNode.isWord()) {
                     currNode = currNode.getChild(0);
                     currWord.append(currNode.getLetter());
@@ -54,6 +60,7 @@ public class Trie implements Iterable<String> {
                 return null;
             }
 
+            // store the word of the node right now
             String ans = currWord.toString();
 
             // if we have children
@@ -64,7 +71,7 @@ public class Trie implements Iterable<String> {
                     currWord.append(currNode.getLetter());
                 } while (!currNode.isWord());
             } else {
-                // otherwise stepBack
+                // otherwise stepBack, see if parent has children
                 stepBack();
             }
 
@@ -73,6 +80,7 @@ public class Trie implements Iterable<String> {
     }
 
 
+    // represents a single node in the trie
     private class TrieNode {
         private List<TrieNode> children;
         private TrieNode parent;
@@ -81,6 +89,7 @@ public class Trie implements Iterable<String> {
 
         public TrieNode(char letter, TrieNode parent) {
             this.letter = letter;
+            // this must be marked through setWord
             this.isWord = false;
             this.parent = parent;
             this.children = null;
@@ -113,6 +122,7 @@ public class Trie implements Iterable<String> {
         // assume children are added in lexographical order
         public void addChild(TrieNode child) {
             if (!hasChildren()) {
+                // create the list if we don't have any previous children
                 children = new ArrayList<TrieNode>(1);
             }
 
@@ -143,19 +153,20 @@ public class Trie implements Iterable<String> {
     private TrieNode root;
 
     public Trie() {
-        // TODO explain that root.letter will not be used
+        // the root node in the trie is not a word
+        // its letter should never be used, so the value doesn't matter
         root = new TrieNode(' ', null);
     }
 
-    public boolean hasPrefix(String s) {
-        return getNodeWithString(s) != null;
-    }
-
+    // find the node corresponding to a sequence of characters
     private TrieNode getNodeWithString(String s) {
         TrieNode currNode = this.root;
+
+        // iterate until we hit a dead end or reach the end of the string
         for (int i = 0; currNode != null && i < s.length(); i++) {
             if (currNode.hasChildren()) {
                 boolean foundNode = false;
+                // find whether a child matches the letter we are looking for
                 for (int j = 0; j < currNode.numChildren(); j++) {
                     if (currNode.getChild(j).getLetter() == s.charAt(i)) {
                         currNode = currNode.getChild(j);
@@ -163,7 +174,9 @@ public class Trie implements Iterable<String> {
                         break;
                     }
                 }
+
                 if (!foundNode) {
+                    // there is no child with the right letter, node DNE
                     return null;
                 }
             }
@@ -172,27 +185,40 @@ public class Trie implements Iterable<String> {
         return currNode;
     }
 
+    public boolean hasPrefix(String s) {
+        return getNodeWithString(s) != null;
+    }
+
+    // insert a word into the trie, do nothing if it already exists
     public void add(String word) {
         TrieNode currNode = this.root;
+
         for (int i = 0; i < word.length(); i++) {
             boolean foundNode = false;
+            // check whether a node with the correct letter exists
             for (int j = 0; j < currNode.numChildren(); j++) {
                 if (currNode.getChild(j).getLetter() == word.charAt(i)) {
+                    // use the existing one as the next node
                     currNode = currNode.getChild(j);
                     foundNode = true;
                     break;
                 }
             }
+
+            // if it doesn't exist, create it
             if (!foundNode) {
                 currNode.addChild(new TrieNode(word.charAt(i), currNode));
                 currNode = currNode.getChild(currNode.numChildren() - 1);
             }
         }
 
+        // mark that the node represents a word
         currNode.setWord(true);
     }
 
+    // check whether the trie contains a word
     public boolean contains(String word) {
+        // find the node corresponding to the sequence of characters
         TrieNode result = getNodeWithString(word);
         return result != null && result.isWord();
     }
