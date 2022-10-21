@@ -16,9 +16,8 @@ public class GameManager implements BoggleGame {
     private char[][] board;
     private int[] scores;
     private SearchTactic searchTactic;
-    private HashMap<String, List<Point>> allWords;
-    private HashSet<String> usedWords;
-    private List<Point> lastWord;
+    private Set<String> usedWords;
+    private List<Point> lastWordPoints;
 
     @Override
     public void newGame(int size, int numPlayers, String cubeFile, BoggleDictionary dict) throws IOException {
@@ -46,9 +45,8 @@ public class GameManager implements BoggleGame {
 
         board = new char[size][size];
         scores = new int[numPlayers];
-        allWords = new HashMap<String, List<Point>>();
         usedWords = new HashSet<String>();
-        lastWord = null;
+        lastWordPoints = null;
 
         setGame(board);
     }
@@ -64,26 +62,27 @@ public class GameManager implements BoggleGame {
 
     @Override
     public int addWord(String word, int player) {
-        if (allWords == null) {
+        if (board == null) {
             System.err.println("No game created");
             return -1;
         }
 
         // TODO update last word
-        if (allWords.containsKey(word) && !usedWords.contains(word)) {
+        if (word.length() >= 4 && !usedWords.contains(word) && searchWord(new HashSet<String>(), word)) {
+            // found the word
+            scores[player] += word.length();
             usedWords.add(word);
             return word.length();
-        } else {
-            return 0;
         }
+        return 0;
     }
 
     @Override
     public List<Point> getLastAddedWord() {
-        if (lastWord == null) {
+        if (lastWordPoints == null) {
             System.err.println("No game created");
         }
-        return lastWord;
+        return lastWordPoints;
     }
 
     @Override
@@ -128,7 +127,7 @@ public class GameManager implements BoggleGame {
         if (searchTactic.equals(SearchTactic.SEARCH_BOARD)) {
             searchBoard(words);
         } else if (searchTactic.equals(SearchTactic.SEARCH_DICT)) {
-
+            searchDict(words);
         } else {
             throw new IllegalArgumentException("Invalid search tactic");
         }
@@ -136,23 +135,47 @@ public class GameManager implements BoggleGame {
         return words;
     }
 
-    private void searchBoard (Collection<String> words) {
-        // TODO: can we use a regular queue instead of deque?
-        // can we break this method into smaller pieces? would improve readability
-        // can we use (custom) int based points instead of AWT double based ones?
+    // dictionary-driven search that iterates over all words in the Dictionary and checks whether these
+        // words can be found on the given board
+    private void searchDict(Collection<String> words) {
+        for (String nextString : dict) {
+            if (nextString.length() >= 4 && searchWord(words, nextString)) {
+                // this string works
+                words.add(nextString);
+            }
+        }
+        lastWordPoints = null;
+    }
 
+    // searches for a specific word in the board
+    private boolean searchWord(Collection<String> words, String desiredWord) {
+        Queue<WordPoints> queue = new LinkedList<WordPoints>();
+        // push the letters that match the start of the word
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                if (board[i][j] == desiredWord.charAt(0)) {
+                    addToQueue(queue, new ArrayList<Point>(), i, j, String.valueOf(board[i][j]));
+                }
+            }
+        }
 
+        return searchQueue(queue, words, desiredWord, false);
+    }
+
+    // board-driven search that recursively search the board for words beginning at each square on the board
+    private void searchBoard(Collection<String> words) {
         Queue<WordPoints> queue = new LinkedList<WordPoints>();
         // push every letter in the board
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
-                List<Point> points = new ArrayList<Point>();
-                points.add(new Point(i, j));
-                WordPoints current = new WordPoints(String.valueOf(board[i][j]), points);
-                queue.add(current);
+                addToQueue(queue, new ArrayList<Point>(), i, j, String.valueOf(board[i][j]));
             }
         }
 
+        searchQueue(queue, words, "", true);
+    }
+
+    private boolean searchQueue(Queue<WordPoints> queue, Collection<String> words, String desiredWord, boolean searchBoard) {
         while (!queue.isEmpty()) {
             WordPoints current = queue.poll();
             String currentWord = current.getWord();
@@ -161,37 +184,92 @@ public class GameManager implements BoggleGame {
             int x = (int)(previousPosition.getX());
             int y = (int)(previousPosition.getY());
 
-            // attempt go in all directions
-            int[][] delta = new int[][] {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {-1, -1}, {1, -1}, {-1, 1}};
-            for (int i = 0; i < delta.length; i++) {
-                int updatedX = x + delta[i][0];
-                int updatedY = y + delta[i][1];
+            if (current.getVisited().contains(new Point(x, y))) {
+                // already visited this point in this path
+                continue;
+            }
+            current.getVisited().add(new Point(x, y));
 
-                if (!outOfBounds(updatedX, updatedY)) {
-                    String updatedWord = currentWord + board[updatedX][updatedY];
-                    // if the current word is a word
-                    if (updatedWord.length() >= 4 && !words.contains(updatedWord) && dict.contains(updatedWord)) {
-                        // dictionary contains the word, we should mark it
-                        words.add(updatedWord);
-                        updateDeque(queue, currentPoints, updatedX, updatedY, updatedWord);
-                    } else if (dict.isPrefix(updatedWord)) {
-                        // we should continue exploring this path
-                        updateDeque(queue, currentPoints, updatedX, updatedY, updatedWord);
-                    }
+            if (searchBoard) {
+                int conditionCheck = searchBoardConditions(currentWord, words);
+                if (conditionCheck == 0) {
+                    // dictionary contains the word, we should mark it
+                    words.add(currentWord);
+                } else if (conditionCheck == 1) {
+                    // we should not continue exploring this path
+                    continue;
                 }
+            } else {
+                int conditionCheck = searchDictConditions(currentWord, desiredWord);
+                if (conditionCheck == 0) {
+                    // found the word
+                    lastWordPoints = currentPoints;
+                    return true;
+                } else if (conditionCheck == 1) {
+                    // we should not continue exploring this path
+                    continue;
+                }
+            }
+
+            updateQueue(queue, currentWord, currentPoints, x, y);
+        }
+
+        return false;
+    }
+
+    private int searchDictConditions(String currentWord, String desiredWord) {
+        if (currentWord.equals(desiredWord)) {
+            // found the word
+            return 0;
+        }
+
+        if (currentWord.length() >= desiredWord.length()) {
+            // we have exceeded the length of the word we're trying to find, and therefore
+            // the current word cannot be the word we're trying to find
+            return 1;
+        }
+
+        if (!currentWord.equals(desiredWord.substring(0, currentWord.length()))) {
+            // the current word is not a prefix of the word we're trying to find, so it cannot be the
+            // word we're trying to find
+            return 1;
+        }
+
+        return 2;
+    }
+
+    private int searchBoardConditions(String currentWord, Collection<String> words) {
+        if (currentWord.length() >= 4 && !words.contains(currentWord) && dict.contains(currentWord)) {
+            // dictionary contains the word, we should mark it
+            return 0;
+        }
+
+        if (!dict.isPrefix(currentWord)) {
+            // we should not continue exploring this path
+            return 1;
+        }
+
+        return 2;
+    }
+
+    private void updateQueue(Queue<WordPoints> queue, String currentWord, List<Point> currentPoints, int x, int y) {
+        // attempt go in all directions
+        int[][] delta = new int[][] {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {-1, -1}, {1, -1}, {-1, 1}};
+        for (int i = 0; i < delta.length; i++) {
+            int updatedX = x + delta[i][0];
+            int updatedY = y + delta[i][1];
+
+            if (!outOfBounds(updatedX, updatedY)) {
+                String updatedWord = currentWord + board[updatedX][updatedY];
+                addToQueue(queue, currentPoints, updatedX, updatedY, updatedWord);
             }
         }
     }
 
-    private void updateDeque(Queue<WordPoints> queue, List<Point> currentPoints, int updatedX, int updatedY, String updatedWord) {
+    private void addToQueue(Queue<WordPoints> queue, List<Point> currentPoints, int updatedX, int updatedY, String updatedWord) {
         List<Point> updatedPoints = new ArrayList<Point>(currentPoints);
         updatedPoints.add(new Point(updatedX, updatedY));
         queue.add(new WordPoints(updatedWord, updatedPoints));
-    }
-
-    // TODO can delete if not needed
-    private boolean outOfBounds(Point current) {
-        return current.getX() < 0 || current.getY() < 0 || current.getX() >= board.length || current.getY() >= board[(int)(current.getX())].length;
     }
 
     private boolean outOfBounds(int x, int y) {
@@ -201,10 +279,12 @@ public class GameManager implements BoggleGame {
     private class WordPoints {
         private String word;
         private List<Point> points;
+        private Set<Point> visited;
 
         public WordPoints(String word, List<Point> points) {
             this.word = word;
             this.points = points;
+            visited = new HashSet<Point>();
         }
 
         public String getWord() {
@@ -214,11 +294,19 @@ public class GameManager implements BoggleGame {
         public List<Point> getPoints() {
             return points;
         }
+
+        public Set<Point> getVisited() {
+            return visited;
+        }
     }
 
     @Override
     public void setSearchTactic(SearchTactic tactic) {
-        searchTactic = tactic;
+        if (tactic != SearchTactic.SEARCH_DICT && tactic != SearchTactic.SEARCH_BOARD) {
+            searchTactic = SEARCH_DEFAULT;
+        } else {
+            searchTactic = tactic;
+        }
     }
 
     @Override

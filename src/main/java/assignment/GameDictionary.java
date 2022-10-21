@@ -25,6 +25,8 @@ public class GameDictionary implements BoggleDictionary {
                 word = word.trim();
                 word = word.toLowerCase();
 
+                // TODO check for invalid characters??
+
                 words.add(word);
             }
         } catch(IOException e) {
