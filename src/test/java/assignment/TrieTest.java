@@ -3,6 +3,9 @@ package assignment;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 
 public class TrieTest {
@@ -15,6 +18,7 @@ public class TrieTest {
 
         return ans.toString();
     }
+
 
     @Test
     void testAddAndIterate() {
@@ -86,5 +90,30 @@ public class TrieTest {
             String prefix = origWord.substring(0, 1 + (int) (Math.random() * origWord.length()));
             Assertions.assertTrue(t.hasPrefix(prefix));
         }
+    }
+
+    @Test
+    void loadDictionary() throws IOException {
+        Trie t = new Trie();
+        BufferedReader br = new BufferedReader(new FileReader("words.txt"));
+
+        String word = br.readLine();
+        Set<String> words = new HashSet<String>();
+
+        while (word != null) {
+            t.add(word);
+            words.add(word);
+            word = br.readLine();
+        }
+
+        for (String currWord : t) {
+            Assertions.assertTrue(words.contains(currWord));
+        }
+
+        for (String currWord : words) {
+            Assertions.assertTrue(t.contains(currWord));
+        }
+
+        Assertions.assertFalse(t.contains("thaecp"));
     }
 }

@@ -1,10 +1,10 @@
-package assignment;
+/*package assignment;
 
 public class Boggle {
     public static void main(String[] args) {
         do {
             // create a new game
-            while (/* user wants to enter more words */) {
+            while (/* user wants to enter more words ) {
                 // display new board
                 // take user entered word
                 // if it is legal, add to score, display where the word was on the board
@@ -13,6 +13,6 @@ public class Boggle {
 
             // computer finds all words that human did not
             // display results
-        } while (/* user wants to play another game*/);
+        } while (/* user wants to play another game);
     }
-}
+}*/

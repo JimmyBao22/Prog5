@@ -164,7 +164,7 @@ public class Trie implements Iterable<String> {
         TrieNode currNode = this.root;
 
         // iterate until we hit a dead end or reach the end of the string
-        for (int i = 0; currNode != null && i < s.length(); i++) {
+        for (int i = 0; i < s.length(); i++) {
             if (currNode.hasChildren()) {
                 boolean foundNode = false;
                 // find whether a child matches the letter we are looking for
@@ -180,6 +180,8 @@ public class Trie implements Iterable<String> {
                     // there is no child with the right letter, node DNE
                     return null;
                 }
+            } else {
+                return null;
             }
         }
 
