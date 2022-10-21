@@ -192,7 +192,6 @@ public class GameManager implements BoggleGame {
                     words.add(currentWord);
                 } else if (conditionCheck == 1) {
                     // we should not continue exploring this path
-                    System.out.println(currentWord);
                     continue;
                 }
             } else {
