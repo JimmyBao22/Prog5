@@ -22,8 +22,6 @@ public class Boggle {
 
                 game.setGame(board);
 
-                System.out.println(dictionary.contains("THAECP"));
-
                 System.out.println(game.getAllWords());
                 // display new board
                 // take user entered word

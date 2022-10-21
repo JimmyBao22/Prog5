@@ -185,10 +185,6 @@ public class GameManager implements BoggleGame {
             }
             visited[x][y] = true;
 
-            if (currentWord.equals("ELA")) {
-                System.out.println("Ahkfjdlskfjlksdaf");
-            }
-
             if (searchBoard) {
                 int conditionCheck = searchBoardConditions(currentWord, words);
                 if (conditionCheck == 0) {
