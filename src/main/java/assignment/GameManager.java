@@ -142,27 +142,27 @@ public class GameManager implements BoggleGame {
         // can we use (custom) int based points instead of AWT double based ones?
 
 
-        ArrayDeque<WordPoints> deque = new ArrayDeque<WordPoints>();
+        Queue<WordPoints> queue = new LinkedList<WordPoints>();
         // push every letter in the board
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 List<Point> points = new ArrayList<Point>();
                 points.add(new Point(i, j));
                 WordPoints current = new WordPoints(String.valueOf(board[i][j]), points);
-                deque.add(current);
+                queue.add(current);
             }
         }
 
-        while (!deque.isEmpty()) {
-            WordPoints current = deque.poll();
+        while (!queue.isEmpty()) {
+            WordPoints current = queue.poll();
             String currentWord = current.getWord();
             List<Point> currentPoints = current.getPoints();
             Point previousPosition = currentPoints.get(currentPoints.size() - 1);
             int x = (int)(previousPosition.getX());
             int y = (int)(previousPosition.getY());
 
-            // attempt go in all four directions
-            int[][] delta = new int[][] {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+            // attempt go in all directions
+            int[][] delta = new int[][] {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {-1, -1}, {1, -1}, {-1, 1}};
             for (int i = 0; i < delta.length; i++) {
                 int updatedX = x + delta[i][0];
                 int updatedY = y + delta[i][1];
@@ -173,20 +173,20 @@ public class GameManager implements BoggleGame {
                     if (updatedWord.length() >= 4 && !words.contains(updatedWord) && dict.contains(updatedWord)) {
                         // dictionary contains the word, we should mark it
                         words.add(updatedWord);
-                        updateDeque(deque, currentPoints, updatedX, updatedY, updatedWord);
+                        updateDeque(queue, currentPoints, updatedX, updatedY, updatedWord);
                     } else if (dict.isPrefix(updatedWord)) {
                         // we should continue exploring this path
-                        updateDeque(deque, currentPoints, updatedX, updatedY, updatedWord);
+                        updateDeque(queue, currentPoints, updatedX, updatedY, updatedWord);
                     }
                 }
             }
         }
     }
 
-    private void updateDeque(ArrayDeque<WordPoints> deque, List<Point> currentPoints, int updatedX, int updatedY, String updatedWord) {
+    private void updateDeque(Queue<WordPoints> queue, List<Point> currentPoints, int updatedX, int updatedY, String updatedWord) {
         List<Point> updatedPoints = new ArrayList<Point>(currentPoints);
         updatedPoints.add(new Point(updatedX, updatedY));
-        deque.add(new WordPoints(updatedWord, updatedPoints));
+        queue.add(new WordPoints(updatedWord, updatedPoints));
     }
 
     // TODO can delete if not needed
