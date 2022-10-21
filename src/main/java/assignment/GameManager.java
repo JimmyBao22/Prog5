@@ -67,6 +67,7 @@ public class GameManager implements BoggleGame {
             System.err.println("No game created");
             return -1;
         }
+        // TODO update last word
         if (allWords.containsKey(word) && !usedWords.contains(word)) {
             usedWords.add(word);
             return word.length();
@@ -113,8 +114,6 @@ public class GameManager implements BoggleGame {
         }
     }
 
-    // TODO talk about this... because I thought we needed to update all words, and then store all words with
-        // their respective list of points (to use getLastAddedWord), but this method only returns a collection of strings
     @Override
     public Collection<String> getAllWords() {
         if (board == null) {
@@ -134,11 +133,6 @@ public class GameManager implements BoggleGame {
     }
 
     private void searchBoard (Collection<String> words) {
-        if (board == null) {
-            System.err.println("No game created");
-            return;
-        }
-
         ArrayDeque<WordPoints> deque = new ArrayDeque<WordPoints>();
         // push every letter in the board
         for (int i = 0; i < board.length; i++) {
@@ -168,9 +162,9 @@ public class GameManager implements BoggleGame {
                 if (!outOfBounds(updatedX, updatedY)) {
                     String updatedWord = currentWord + board[updatedX][updatedY];
                     // if the current word is a word
-                    if (updatedWord.length() >= 4 && !allWords.containsKey(updatedWord) && dict.contains(updatedWord)) {
+                    if (updatedWord.length() >= 4 && !words.contains(updatedWord) && dict.contains(updatedWord)) {
                         // dictionary contains the word
-                        allWords.put(updatedWord, currentPoints);
+                        words.add(updatedWord);
                         updateDeque(deque, currentPoints, updatedX, updatedY, updatedWord);
                     } else if (dict.isPrefix(updatedWord)) {
                         // can go to this position
