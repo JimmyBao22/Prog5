@@ -45,10 +45,17 @@ public class GameManager implements BoggleGame {
 
         board = new char[size][size];
         scores = new int[numPlayers];
+        searchTactic = SEARCH_DEFAULT;
         usedWords = new HashSet<String>();
         lastWordPoints = null;
 
-        setGame(board);
+        // sets the game based on randomized arrangement of cubes
+        // TODO, based on piazza post if there are jagged grids, update this
+        shuffle();
+        for (int i = 0; i < cubeStrings.length; i++) {
+            int index = (int)(Math.random() * cubeStrings[i].length());
+            board[i / size][i % size] = cubeStrings[i].charAt(index);
+        }
     }
 
     @Override
@@ -67,7 +74,6 @@ public class GameManager implements BoggleGame {
             return -1;
         }
 
-        // TODO update last word
         if (word.length() >= 4 && !usedWords.contains(word) && searchWord(new HashSet<String>(), word)) {
             // found the word
             scores[player] += word.length();
@@ -87,33 +93,13 @@ public class GameManager implements BoggleGame {
 
     @Override
     public void setGame(char[][] board) {
-        if (cubeStrings == null) {
-            System.err.println("No game created");
-            return;
-        }
-        if (size * size != cubeStrings.length) {
-            throw new IllegalArgumentException("Invalid input for the amount of cubes");
-        }
+        this.board = board;
 
-        // TODO, based on piazza post if there are jagged grids, update this
-        shuffle();
-        for (int i = 0; i < cubeStrings.length; i++) {
-            int index = (int)(Math.random() * cubeStrings[i].length());
-            board[i / size][i % size] = cubeStrings[i].charAt(index);
-        }
-    }
-
-    private void shuffle() {
-        Random rand = new Random();
-
-        for (int i = 0; i < cubeStrings.length; i++) {
-            int switchIndex = rand.nextInt(cubeStrings.length);
-
-            // swap the strings at indices i and switch index
-            String temp = cubeStrings[i];
-            cubeStrings[i] = cubeStrings[switchIndex];
-            cubeStrings[switchIndex] = temp;
-        }
+        // resetting instance variables
+        Arrays.fill(scores, 0);
+        usedWords.clear();
+        lastWordPoints.clear();
+        size = board.length;
     }
 
     @Override
@@ -172,6 +158,7 @@ public class GameManager implements BoggleGame {
             }
         }
 
+        // since we are searching for all words, there is no specific desired word
         searchQueue(queue, words, "", true);
     }
 
@@ -316,5 +303,18 @@ public class GameManager implements BoggleGame {
         }
 
         return scores;
+    }
+
+    private void shuffle() {
+        Random rand = new Random();
+
+        for (int i = 0; i < cubeStrings.length; i++) {
+            int switchIndex = rand.nextInt(cubeStrings.length);
+
+            // swap the strings at indices i and switch index
+            String temp = cubeStrings[i];
+            cubeStrings[i] = cubeStrings[switchIndex];
+            cubeStrings[switchIndex] = temp;
+        }
     }
 }
