@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Trie implements Iterable<String> {
-    class TrieIterator implements Iterator<String> {
+    private class TrieIterator implements Iterator<String> {
         // track which node we are in the trie
          TrieNode currNode;
          StringBuilder currWord;

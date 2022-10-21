@@ -4,10 +4,8 @@ import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Random;
 
 public class GameManager implements BoggleGame {
 
@@ -18,7 +16,8 @@ public class GameManager implements BoggleGame {
     private char[][] board;
     private int[] scores;
     private SearchTactic searchTactic;
-    private HashSet<String> allWords, usedWords;
+    private HashMap<String, List<Point>> allWords;
+    private HashSet<String> usedWords;
     private List<Point> lastWord;
 
     @Override
@@ -47,7 +46,7 @@ public class GameManager implements BoggleGame {
 
         board = new char[size][size];
         scores = new int[numPlayers];
-        allWords = new HashSet<String>();
+        allWords = new HashMap<String, List<Point>>();
         usedWords = new HashSet<String>();
         lastWord = null;
 
@@ -68,7 +67,7 @@ public class GameManager implements BoggleGame {
             System.err.println("No game created");
             return -1;
         }
-        if (allWords.contains(word) && !usedWords.contains(word)) {
+        if (allWords.containsKey(word) && !usedWords.contains(word)) {
             usedWords.add(word);
             return word.length();
         } else {
@@ -114,6 +113,8 @@ public class GameManager implements BoggleGame {
         }
     }
 
+    // TODO talk about this... because I thought we needed to update all words, and then store all words with
+        // their respective list of points (to use getLastAddedWord), but this method only returns a collection of strings
     @Override
     public Collection<String> getAllWords() {
         if (board == null) {
@@ -122,14 +123,96 @@ public class GameManager implements BoggleGame {
         }
         Collection<String> words = new HashSet<String>();
         if (searchTactic.equals(SearchTactic.SEARCH_BOARD)) {
-
+            searchBoard(words);
         } else if (searchTactic.equals(SearchTactic.SEARCH_DICT)) {
 
         } else {
-
+            throw new IllegalArgumentException("Invalid search tactic");
         }
 
-        return null;
+        return words;
+    }
+
+    private void searchBoard (Collection<String> words) {
+        if (board == null) {
+            System.err.println("No game created");
+            return;
+        }
+
+        ArrayDeque<WordPoints> deque = new ArrayDeque<WordPoints>();
+        // push every letter in the board
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                List<Point> points = new ArrayList<Point>();
+                points.add(new Point(i, j));
+                WordPoints current = new WordPoints(String.valueOf(board[i][j]), points);
+                deque.add(current);
+            }
+        }
+
+        while (!deque.isEmpty()) {
+            WordPoints current = deque.poll();
+            String currentWord = current.getWord();
+            List<Point> currentPoints = current.getPoints();
+            Point previousPosition = currentPoints.get(currentPoints.size() - 1);
+            int x = (int)(previousPosition.getX());
+            int y = (int)(previousPosition.getY());
+
+            // attempt go in all four directions
+
+            int[] rowUpdate = new int[] {1, -1, 0, 0};
+            int[] columnUpdate = new int[] {0, 0, 1, -1};
+            for (int i = 0; i < rowUpdate.length; i++) {
+                int updatedX = x + rowUpdate[i];
+                int updatedY = y + columnUpdate[i];
+                if (!outOfBounds(updatedX, updatedY)) {
+                    String updatedWord = currentWord + board[updatedX][updatedY];
+                    // if the current word is a word
+                    if (updatedWord.length() >= 4 && !allWords.containsKey(updatedWord) && dict.contains(updatedWord)) {
+                        // dictionary contains the word
+                        allWords.put(updatedWord, currentPoints);
+                        updateDeque(deque, currentPoints, updatedX, updatedY, updatedWord);
+                    } else if (dict.isPrefix(updatedWord)) {
+                        // can go to this position
+                        updateDeque(deque, currentPoints, updatedX, updatedY, updatedWord);
+                    }
+                }
+            }
+        }
+    }
+
+    private void updateDeque(ArrayDeque<WordPoints> deque, List<Point> currentPoints, int updatedX, int updatedY, String updatedWord) {
+        List<Point> updatedPoints = new ArrayList<Point>();
+        updatedPoints.addAll(currentPoints);
+        updatedPoints.add(new Point(updatedX, updatedY));
+        deque.add(new WordPoints(updatedWord, updatedPoints));
+    }
+
+    // TODO can delete if not needed
+    private boolean outOfBounds(Point current) {
+        return current.getX() < 0 || current.getY() < 0 || current.getX() >= board.length || current.getY() >= board[(int)(current.getX())].length;
+    }
+
+    private boolean outOfBounds(int x, int y) {
+        return x < 0 || y < 0 || x >= board.length || y >= board[x].length;
+    }
+
+    private class WordPoints {
+        private String word;
+        private List<Point> points;
+
+        public WordPoints(String word, List<Point> points) {
+            this.word = word;
+            this.points = points;
+        }
+
+        public String getWord() {
+            return word;
+        }
+
+        public List<Point> getPoints() {
+            return points;
+        }
     }
 
     @Override
