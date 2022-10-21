@@ -14,11 +14,16 @@ public class Boggle {
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
             do {
                 game.newGame(4, 2, "cubes.txt", dictionary);
-                char[][] board = game.getBoard();
-                for (int i = 0; i < board.length; i++) {
-                    System.out.println(Arrays.toString(board[i]));
-                }
-                System.out.println(Arrays.toString(game.getScores()));
+
+                char[][] board = {{'E', 'E', 'C', 'A'},
+                        {'A', 'L', 'E', 'P'},
+                        {'H', 'N', 'B', 'O'},
+                        {'Q', 'T', 'T', 'Y'}};
+
+                game.setGame(board);
+
+                System.out.println(dictionary.contains("THAECP"));
+
                 System.out.println(game.getAllWords());
                 // display new board
                 // take user entered word

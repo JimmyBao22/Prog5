@@ -37,6 +37,7 @@ public class GameManager implements BoggleGame {
             cubeStrings = new String[size * size];
             for (int i = 0; i < cubeStrings.length; i++) {
                 cubeStrings[i] = reader.readLine();
+                cubeStrings[i] = cubeStrings[i].toUpperCase();
             }
         } catch (IOException e) {
             System.err.println("Error reading instruction file: " + e.getMessage());
@@ -93,12 +94,18 @@ public class GameManager implements BoggleGame {
 
     @Override
     public void setGame(char[][] board) {
+        if (this.board == null) {
+            // game hasn't been initialized yet, don't need to reset instance variables
+            this.board = board;
+            return;
+        }
+
         this.board = board;
 
         // resetting instance variables
         Arrays.fill(scores, 0);
         usedWords.clear();
-        lastWordPoints.clear();
+        if (lastWordPoints != null) lastWordPoints.clear();
         size = board.length;
     }
 
@@ -140,7 +147,7 @@ public class GameManager implements BoggleGame {
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 if (board[i][j] == desiredWord.charAt(0)) {
-                    addToQueue(queue, new ArrayList<Point>(), i, j, String.valueOf(board[i][j]));
+                    addToQueue(queue, new ArrayList<Point>(), i, j, String.valueOf(board[i][j]), null);
                 }
             }
         }
@@ -154,7 +161,7 @@ public class GameManager implements BoggleGame {
         // push every letter in the board
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
-                addToQueue(queue, new ArrayList<Point>(), i, j, String.valueOf(board[i][j]));
+                addToQueue(queue, new ArrayList<Point>(), i, j, String.valueOf(board[i][j]), null);
             }
         }
 
@@ -170,12 +177,17 @@ public class GameManager implements BoggleGame {
             Point previousPosition = currentPoints.get(currentPoints.size() - 1);
             int x = (int)(previousPosition.getX());
             int y = (int)(previousPosition.getY());
+            boolean[][] visited = current.getVisited();
 
-            if (current.getVisited().contains(new Point(x, y))) {
+            if (visited[x][y]) {
                 // already visited this point in this path
                 continue;
             }
-            current.getVisited().add(new Point(x, y));
+            visited[x][y] = true;
+
+            if (currentWord.equals("ELA")) {
+                System.out.println("Ahkfjdlskfjlksdaf");
+            }
 
             if (searchBoard) {
                 int conditionCheck = searchBoardConditions(currentWord, words);
@@ -184,6 +196,7 @@ public class GameManager implements BoggleGame {
                     words.add(currentWord);
                 } else if (conditionCheck == 1) {
                     // we should not continue exploring this path
+                    System.out.println(currentWord);
                     continue;
                 }
             } else {
@@ -198,7 +211,7 @@ public class GameManager implements BoggleGame {
                 }
             }
 
-            updateQueue(queue, currentWord, currentPoints, x, y);
+            updateQueue(queue, currentWord, currentPoints, x, y, visited);
         }
 
         return false;
@@ -239,7 +252,7 @@ public class GameManager implements BoggleGame {
         return 2;
     }
 
-    private void updateQueue(Queue<WordPoints> queue, String currentWord, List<Point> currentPoints, int x, int y) {
+    private void updateQueue(Queue<WordPoints> queue, String currentWord, List<Point> currentPoints, int x, int y, boolean[][] visited) {
         // attempt go in all directions
         int[][] delta = new int[][] {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {-1, -1}, {1, -1}, {-1, 1}};
         for (int i = 0; i < delta.length; i++) {
@@ -248,15 +261,15 @@ public class GameManager implements BoggleGame {
 
             if (!outOfBounds(updatedX, updatedY)) {
                 String updatedWord = currentWord + board[updatedX][updatedY];
-                addToQueue(queue, currentPoints, updatedX, updatedY, updatedWord);
+                addToQueue(queue, currentPoints, updatedX, updatedY, updatedWord, visited);
             }
         }
     }
 
-    private void addToQueue(Queue<WordPoints> queue, List<Point> currentPoints, int updatedX, int updatedY, String updatedWord) {
+    private void addToQueue(Queue<WordPoints> queue, List<Point> currentPoints, int updatedX, int updatedY, String updatedWord, boolean[][] visited) {
         List<Point> updatedPoints = new ArrayList<Point>(currentPoints);
         updatedPoints.add(new Point(updatedX, updatedY));
-        queue.add(new WordPoints(updatedWord, updatedPoints));
+        queue.add(new WordPoints(updatedWord, updatedPoints, visited));
     }
 
     private boolean outOfBounds(int x, int y) {
@@ -266,12 +279,18 @@ public class GameManager implements BoggleGame {
     private class WordPoints {
         private String word;
         private List<Point> points;
-        private Set<Point> visited;
+        private boolean[][] visited;
 
-        public WordPoints(String word, List<Point> points) {
+        public WordPoints(String word, List<Point> points, boolean[][] visited) {
             this.word = word;
             this.points = points;
-            visited = new HashSet<Point>();
+            // TODO make this the same size as board
+            this.visited = new boolean[size][size];
+            if (visited != null) {
+                for (int i = 0; i < visited.length; i++) {
+                    this.visited[i] = Arrays.copyOf(visited[i], visited[i].length);
+                }
+            }
         }
 
         public String getWord() {
@@ -282,7 +301,7 @@ public class GameManager implements BoggleGame {
             return points;
         }
 
-        public Set<Point> getVisited() {
+        public boolean[][] getVisited() {
             return visited;
         }
     }
