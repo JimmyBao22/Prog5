@@ -15,13 +15,6 @@ public class Boggle {
             do {
                 game.newGame(4, 2, "cubes.txt", dictionary);
 
-                char[][] board = {{'E', 'E', 'C', 'A'},
-                        {'A', 'L', 'E', 'P'},
-                        {'H', 'N', 'B', 'O'},
-                        {'Q', 'T', 'T', 'Y'}};
-
-                game.setGame(board);
-
                 System.out.println(game.getAllWords());
                 // display new board
                 // take user entered word
