@@ -25,13 +25,14 @@ public class GameManager implements BoggleGame {
         this.numPlayers = numPlayers;
         this.cubeFile = cubeFile;
         this.dict = dict;
-        if (size < 0) {
-            throw new IllegalArgumentException("size is less than 0");
+        if (size <= 0) {
+            throw new IllegalArgumentException("size needs to be a positive integer");
         }
         if (numPlayers < 0) {
             throw new IllegalArgumentException("number of players is less than 0");
         }
 
+        // TODO do we need to repeat cubes if we run out?
         try {
             BufferedReader reader = new BufferedReader(new FileReader(cubeFile));
             cubeStrings = new String[size * size];
@@ -51,7 +52,6 @@ public class GameManager implements BoggleGame {
         lastWordPoints = null;
 
         // sets the game based on randomized arrangement of cubes
-        // TODO, based on piazza post if there are jagged grids, update this
         shuffle();
         for (int i = 0; i < cubeStrings.length; i++) {
             int index = (int)(Math.random() * cubeStrings[i].length());
@@ -75,7 +75,7 @@ public class GameManager implements BoggleGame {
             return -1;
         }
 
-        if (word.length() >= 4 && !usedWords.contains(word) && searchWord(new HashSet<String>(), word)) {
+        if (word.length() >= 4 && !usedWords.contains(word) && searchWord(word)) {
             // found the word
             scores[player] += word.length();
             usedWords.add(word);
@@ -132,7 +132,7 @@ public class GameManager implements BoggleGame {
         // words can be found on the given board
     private void searchDict(Collection<String> words) {
         for (String nextString : dict) {
-            if (nextString.length() >= 4 && searchWord(words, nextString)) {
+            if (nextString.length() >= 4 && searchWord(nextString)) {
                 // this string works
                 words.add(nextString);
             }
@@ -141,7 +141,7 @@ public class GameManager implements BoggleGame {
     }
 
     // searches for a specific word in the board
-    private boolean searchWord(Collection<String> words, String desiredWord) {
+    private boolean searchWord(String desiredWord) {
         Queue<WordPoints> queue = new LinkedList<WordPoints>();
         // push the letters that match the start of the word
         for (int i = 0; i < board.length; i++) {
@@ -152,7 +152,7 @@ public class GameManager implements BoggleGame {
             }
         }
 
-        return searchQueue(queue, words, desiredWord, false);
+        return searchQueue(queue, null, desiredWord, false);
     }
 
     // board-driven search that recursively search the board for words beginning at each square on the board
