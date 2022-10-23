@@ -19,6 +19,7 @@ public class GameManager implements BoggleGame {
     private Set<String> usedWords;
     private List<Point> lastWordPoints;
 
+    // Creates a new Boggle game using a size x size board and the cubes specified in the file cubeFile.
     @Override
     public void newGame(int size, int numPlayers, String cubeFile, BoggleDictionary dict) throws IOException {
         this.size = size;
@@ -32,13 +33,25 @@ public class GameManager implements BoggleGame {
             throw new IllegalArgumentException("number of players is less than 0");
         }
 
-        // TODO do we need to repeat cubes if we run out?
         try {
             BufferedReader reader = new BufferedReader(new FileReader(cubeFile));
             cubeStrings = new String[size * size];
             for (int i = 0; i < cubeStrings.length; i++) {
-                cubeStrings[i] = reader.readLine();
+                String next = reader.readLine();
+                if (next != null) {
+                    cubeStrings[i] = next;
+                } else {
+                    // if there are not enough cubes in the file, repeat a past cube
+                    cubeStrings[i] = cubeStrings[(int)(Math.random() * i)];
+                }
                 cubeStrings[i] = cubeStrings[i].toLowerCase();
+                // check for invalid characters
+                for (int j = 0; j < cubeStrings[i].length(); j++) {
+                    if (cubeStrings[i].charAt(j) - 'a' < 0 || cubeStrings[i].charAt(j) - 'z' > 0) {
+                        // invalid character found
+                        throw new IllegalArgumentException("illegal cube character");
+                    }
+                }
             }
         } catch (IOException e) {
             System.err.println("Error reading instruction file: " + e.getMessage());
@@ -59,6 +72,7 @@ public class GameManager implements BoggleGame {
         }
     }
 
+    // gets the current board state
     @Override
     public char[][] getBoard() {
         if (board == null) {
@@ -68,6 +82,8 @@ public class GameManager implements BoggleGame {
         return board;
     }
 
+    // adds a word to the player's list and updates their score (if the word is valid) and returns
+    // the point value of the word
     @Override
     public int addWord(String word, int player) {
         if (board == null) {
@@ -84,6 +100,7 @@ public class GameManager implements BoggleGame {
         return 0;
     }
 
+    // returns the positions of the characters of the last added word
     @Override
     public List<Point> getLastAddedWord() {
         if (lastWordPoints == null) {
@@ -92,6 +109,7 @@ public class GameManager implements BoggleGame {
         return lastWordPoints;
     }
 
+    // sets the board state and resets certain instance variables
     @Override
     public void setGame(char[][] board) {
         if (this.board == null) {
@@ -109,6 +127,7 @@ public class GameManager implements BoggleGame {
         size = board.length;
     }
 
+    // returns a collection containing all valid words in the current Boggle board using the current search tactic
     @Override
     public Collection<String> getAllWords() {
         if (board == null) {
@@ -129,11 +148,11 @@ public class GameManager implements BoggleGame {
     }
 
     // dictionary-driven search that iterates over all words in the Dictionary and checks whether these
-        // words can be found on the given board
+    // words can be found on the given board
     private void searchDict(Collection<String> words) {
         for (String nextString : dict) {
             if (nextString.length() >= 4 && searchWord(nextString)) {
-                // this string works
+                // this string works, add it to the collection
                 words.add(nextString);
             }
         }
@@ -143,7 +162,8 @@ public class GameManager implements BoggleGame {
     // searches for a specific word in the board
     private boolean searchWord(String desiredWord) {
         Queue<WordPoints> queue = new LinkedList<WordPoints>();
-        // push the letters that match the start of the word
+
+        // push all the letters that match the first character of the word into the queue
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 if (board[i][j] == desiredWord.charAt(0)) {
@@ -158,7 +178,8 @@ public class GameManager implements BoggleGame {
     // board-driven search that recursively search the board for words beginning at each square on the board
     private void searchBoard(Collection<String> words) {
         Queue<WordPoints> queue = new LinkedList<WordPoints>();
-        // push every letter in the board
+
+        // push every letter in the board into the queue
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 addToQueue(queue, new ArrayList<Point>(), i, j, String.valueOf(board[i][j]), null);
@@ -169,7 +190,10 @@ public class GameManager implements BoggleGame {
         searchQueue(queue, words, "", true);
     }
 
+    // searches the board for either a specific word, or for all words (depending on whether this function
+    // was called from searchWord or searchBoard (uses a boolean to keep track of which))
     private boolean searchQueue(Queue<WordPoints> queue, Collection<String> words, String desiredWord, boolean searchBoard) {
+        // while there are still elements in the queue, continue to search for words
         while (!queue.isEmpty()) {
             WordPoints current = queue.poll();
             String currentWord = current.getWord();
@@ -206,12 +230,14 @@ public class GameManager implements BoggleGame {
                 }
             }
 
+            // update the queue by appending characters around the current position to the current word
             updateQueue(queue, currentWord, currentPoints, x, y, visited);
         }
 
         return false;
     }
 
+    // checks dictionary-driven search conditions
     private int searchDictConditions(String currentWord, String desiredWord) {
         if (currentWord.equals(desiredWord)) {
             // found the word
@@ -233,6 +259,7 @@ public class GameManager implements BoggleGame {
         return 2;
     }
 
+    // checks board-driven search conditions
     private int searchBoardConditions(String currentWord, Collection<String> words) {
         if (currentWord.length() >= 4 && !words.contains(currentWord) && dict.contains(currentWord)) {
             // dictionary contains the word, we should mark it
@@ -247,8 +274,9 @@ public class GameManager implements BoggleGame {
         return 2;
     }
 
+    // updates the queue by attempting to go in all directions and appending to the current word based on the current position
     private void updateQueue(Queue<WordPoints> queue, String currentWord, List<Point> currentPoints, int x, int y, boolean[][] visited) {
-        // attempt go in all directions
+        // attempts go in all directions
         int[][] delta = new int[][] {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {-1, -1}, {1, -1}, {-1, 1}};
         for (int i = 0; i < delta.length; i++) {
             int updatedX = x + delta[i][0];
@@ -261,16 +289,19 @@ public class GameManager implements BoggleGame {
         }
     }
 
+    // adds this specific updated word and updated positions to the queue
     private void addToQueue(Queue<WordPoints> queue, List<Point> currentPoints, int updatedX, int updatedY, String updatedWord, boolean[][] visited) {
         List<Point> updatedPoints = new ArrayList<Point>(currentPoints);
         updatedPoints.add(new Point(updatedX, updatedY));
         queue.add(new WordPoints(updatedWord, updatedPoints, visited));
     }
 
+    // checks if the given position is out of bounds of the board
     private boolean outOfBounds(int x, int y) {
         return x < 0 || y < 0 || x >= board.length || y >= board[x].length;
     }
 
+    // class that stores the current word, as well as the list of points and positions visited
     private class WordPoints {
         private String word;
         private List<Point> points;
@@ -279,9 +310,10 @@ public class GameManager implements BoggleGame {
         public WordPoints(String word, List<Point> points, boolean[][] visited) {
             this.word = word;
             this.points = points;
-            // TODO make this the same size as board
+
             this.visited = new boolean[size][size];
             if (visited != null) {
+                // copy the previous visited array
                 for (int i = 0; i < visited.length; i++) {
                     this.visited[i] = Arrays.copyOf(visited[i], visited[i].length);
                 }
@@ -301,15 +333,18 @@ public class GameManager implements BoggleGame {
         }
     }
 
+    // Sets the search tactic (used by getAllWords()) to the given tactic
     @Override
     public void setSearchTactic(SearchTactic tactic) {
         if (tactic != SearchTactic.SEARCH_DICT && tactic != SearchTactic.SEARCH_BOARD) {
+            // if the search tactic parameter is invalid, then set the search tactic to the default one
             searchTactic = SEARCH_DEFAULT;
         } else {
             searchTactic = tactic;
         }
     }
 
+    // gets the current scores for all players
     @Override
     public int[] getScores() {
         if (scores == null) {
@@ -319,6 +354,7 @@ public class GameManager implements BoggleGame {
         return scores;
     }
 
+    // shuffles the cube strings array
     private void shuffle() {
         Random rand = new Random();
 

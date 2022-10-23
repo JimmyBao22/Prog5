@@ -25,7 +25,13 @@ public class GameDictionary implements BoggleDictionary {
                 word = word.trim();
                 word = word.toLowerCase();
 
-                // TODO check for invalid characters??
+                // check for invalid characters
+                for (int j = 0; j < word.length(); j++) {
+                    if (word.charAt(j) - 'a' < 0 || word.charAt(j) - 'z' > 0) {
+                        // invalid character found
+                        throw new IllegalArgumentException("illegal word character");
+                    }
+                }
 
                 words.add(word);
             }
