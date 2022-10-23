@@ -50,7 +50,7 @@ public class DefaultBoardTests {
         Assertions.assertEquals(allWords.size(), allSupposedWords.length);
 
         for (int i = 0; i < allWords.size(); i++) {
-            allSupposedWords[i] = allSupposedWords[i].toUpperCase();
+            allSupposedWords[i] = allSupposedWords[i].toLowerCase();
             Assertions.assertEquals(allWords.get(i), allSupposedWords[i]);
         }
 
@@ -66,7 +66,7 @@ public class DefaultBoardTests {
         Assertions.assertEquals(allWords.size(), allSupposedWords.length);
 
         for (int i = 0; i < allWords.size(); i++) {
-            allSupposedWords[i] = allSupposedWords[i].toUpperCase();
+            allSupposedWords[i] = allSupposedWords[i].toLowerCase();
             Assertions.assertEquals(allWords.get(i), allSupposedWords[i]);
         }
     }
