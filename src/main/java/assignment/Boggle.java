@@ -16,9 +16,10 @@ public class Boggle {
     private Set<String> guessedWords;
 
     // should only be constructed within this class
-    private Boggle() {
+    private Boggle() throws IOException {
         this.manager = new GameManager();
         this.dict = new GameDictionary();
+        dict.loadDictionary("words.txt");
         this.inputReader = new BufferedReader(new InputStreamReader(System.in));
         this.currPlayer = 0;
         this.guessedWords = null;
@@ -119,6 +120,8 @@ public class Boggle {
                 markedBoard[i][j] += 'A';
             }
 
+            System.out.println('\"' + userWord + "\" was a valid guess: +" + result + " points.");
+            guessedWords.add(userWord);
             displayBoard(markedBoard);
             return true;
         } else {
@@ -197,14 +200,14 @@ public class Boggle {
 
         // ask each user that is still playing for a guess, until no users want to guess anymore
         do {
-            displayBoard(manager.getBoard());
-
             // store which players are still guessing
             Iterator<Integer> guessingPlayers = stillGuessing.iterator();
             while (guessingPlayers.hasNext()) {
                 currPlayer = guessingPlayers.next();
 
                 String guessedWord;
+
+                displayBoard(manager.getBoard());
 
                 // ask the user for a guess until they stop guessing or the have a valid word
                 do {

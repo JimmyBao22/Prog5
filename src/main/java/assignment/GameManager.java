@@ -38,7 +38,7 @@ public class GameManager implements BoggleGame {
             cubeStrings = new String[size * size];
             for (int i = 0; i < cubeStrings.length; i++) {
                 cubeStrings[i] = reader.readLine();
-                cubeStrings[i] = cubeStrings[i].toUpperCase();
+                cubeStrings[i] = cubeStrings[i].toLowerCase();
             }
         } catch (IOException e) {
             System.err.println("Error reading instruction file: " + e.getMessage());

@@ -23,7 +23,7 @@ public class GameDictionary implements BoggleDictionary {
             while ((word = reader.readLine()) != null) {
                 // remove excess whitespace and move to lowercase
                 word = word.trim();
-                word = word.toUpperCase();
+                word = word.toLowerCase();
 
                 // TODO check for invalid characters??
 
@@ -36,7 +36,7 @@ public class GameDictionary implements BoggleDictionary {
 
     @Override
     public boolean isPrefix(String prefix) {
-        prefix = prefix.toUpperCase();
+        prefix = prefix.toLowerCase();
         if (words == null) {
             System.err.println("No loaded dictionary");
             return false;
@@ -47,7 +47,7 @@ public class GameDictionary implements BoggleDictionary {
 
     @Override
     public boolean contains(String word) {
-        word = word.toUpperCase();
+        word = word.toLowerCase();
         if (words == null) {
             System.err.println("No loaded dictionary");
             return false;
