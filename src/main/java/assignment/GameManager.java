@@ -112,6 +112,13 @@ public class GameManager implements BoggleGame {
     // sets the board state and resets certain instance variables
     @Override
     public void setGame(char[][] board) {
+        // change all of board's characters to lowercase
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[0].length; j++) {
+                board[i][j] = (String.valueOf(board[i][j]).toLowerCase()).charAt(0);
+            }
+        }
+
         if (this.board == null) {
             // game hasn't been initialized yet, don't need to reset instance variables
             this.board = board;

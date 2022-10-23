@@ -33,23 +33,12 @@ public class DefaultBoardTests {
 
         game.setGame(board);
 
-        game.setSearchTactic(BoggleGame.SearchTactic.SEARCH_BOARD);
-
-        Collection<String> allWordsSet = game.getAllWords();
-        List<String> allWords = new ArrayList<String>();
-        for (String s : allWordsSet) allWords.add(s);
-        Collections.sort(allWords);
-
         String[] allSupposedWords = {"lean", "pace", "bent", "peel", "pent", "clan", "clean", "lent",
                 "elan", "celeb", "cape", "capelan", "capo", "cent", "cento", "alee",
                 "alec", "anele", "leant", "lane", "leap", "lento", "peace", "pele",
                 "penal", "hale", "hant", "neap", "blae", "blah", "blent", "becap",
                 "benthal", "bott", "open", "thae", "than", "thane", "toecap", "tope",
                 "topee", "toby"};
-
-        for (int i = 0; i < allSupposedWords.length; i++) {
-            allSupposedWords[i] = allSupposedWords[i].toUpperCase();
-        }
 
         Set<String> used = new HashSet<String>();
         int[] scores = new int[numPlayers];
