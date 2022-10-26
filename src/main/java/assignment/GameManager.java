@@ -93,9 +93,9 @@ public class GameManager implements BoggleGame {
 
         if (word.length() >= 4 && !usedWords.contains(word) && searchWord(word)) {
             // found the word
-            scores[player] += word.length();
+            scores[player] += (word.length() - 3);
             usedWords.add(word);
-            return word.length();
+            return (word.length() - 3);
         }
         return 0;
     }

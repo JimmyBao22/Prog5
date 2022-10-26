@@ -11,13 +11,15 @@ import java.io.InputStreamReader;
 import java.util.*;
 import java.util.List;
 
+
+
 public class DefaultBoardTests {
 
     public static void main(String[] args) throws IOException {
-        // note: this is the default board given in the example in the pdf, useful for testing
+        // note: this uses the default board given in the example in the pdf, useful for testing
     }
 
-    @RepeatedTest(1000)
+    @RepeatedTest(100)
     void testAddingWords() throws IOException {
         GameManager game = new GameManager();
         GameDictionary dictionary = new GameDictionary();
@@ -49,7 +51,7 @@ public class DefaultBoardTests {
             int index = (int)(Math.random() * allSupposedWords.length);
             game.addWord(allSupposedWords[index], player);
             if (!used.contains(allSupposedWords[index])) {
-                scores[player] += allSupposedWords[index].length();
+                scores[player] += (allSupposedWords[index].length() - 3);
             }
 
             for (int j = 0; j < numPlayers; j++) {

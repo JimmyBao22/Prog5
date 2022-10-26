@@ -33,7 +33,7 @@ public class Boggle {
 
     // read the user's next word
     private String getUserGuess() throws IOException {
-        return getPromptResponse("Player " + currPlayer + ": enter a word (RETURN if done guessing): ");
+        return getPromptResponse("Player " + (currPlayer+1) + ": enter a word (RETURN if done guessing): ");
     }
 
     // determine whether the user wants to play another game
@@ -211,7 +211,7 @@ public class Boggle {
 
                 // ask the user for a guess until they stop guessing or the have a valid word
                 do {
-                    guessedWord = getUserGuess();
+                    guessedWord = getUserGuess().toLowerCase();
 
                     if (guessedWord == null || guessedWord.length() == 0) {
                         // this player does not want to guess anymore
