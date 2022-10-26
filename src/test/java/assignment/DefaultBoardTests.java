@@ -21,10 +21,9 @@ public class DefaultBoardTests {
 
     @RepeatedTest(100)
     void testAddingWords() throws IOException {
-        GameManager game = new GameManager();
-        GameDictionary dictionary = new GameDictionary();
+        BoggleGame game = new GameManager();
+        BoggleDictionary dictionary = new GameDictionary();
         dictionary.loadDictionary("words.txt");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         int numPlayers = 2;
         game.newGame(4, numPlayers, "cubes.txt", dictionary);
 
@@ -75,10 +74,9 @@ public class DefaultBoardTests {
 
     @Test
     void testGetAllWords() throws IOException {
-        GameManager game = new GameManager();
-        GameDictionary dictionary = new GameDictionary();
+        BoggleGame game = new GameManager();
+        BoggleDictionary dictionary = new GameDictionary();
         dictionary.loadDictionary("words.txt");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         game.newGame(4, 2, "cubes.txt", dictionary);
 
         char[][] board = {{'E', 'E', 'C', 'A'},
@@ -88,6 +86,13 @@ public class DefaultBoardTests {
 
         game.setGame(board);
 
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[0].length; j++) {
+                Assertions.assertEquals(board[i][j], game.getBoard()[i][j]);
+            }
+        }
+
+        System.out.println("Search Tactic: Search Board");
         game.setSearchTactic(BoggleGame.SearchTactic.SEARCH_BOARD);
 
         Collection<String> allWordsSet = game.getAllWords();
@@ -113,6 +118,7 @@ public class DefaultBoardTests {
 
         game.setGame(board);
 
+        System.out.println("Search Tactic: Search Dict");
         game.setSearchTactic(BoggleGame.SearchTactic.SEARCH_DICT);
 
         allWordsSet = game.getAllWords();
