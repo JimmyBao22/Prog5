@@ -88,9 +88,14 @@ public class GameManager implements BoggleGame {
     public int addWord(String word, int player) {
         if (board == null) {
             System.err.println("No game created");
-            return -1;
+            return 0;
+        }
+        if (word == null || player < 0 || player >= numPlayers) {
+            System.err.println("invalid input");
+            return 0;
         }
 
+        word = word.toLowerCase();
         if (word.length() >= 4 && !usedWords.contains(word) && searchWord(word)) {
             // found the word
             scores[player] += (word.length() - 3);
@@ -104,7 +109,7 @@ public class GameManager implements BoggleGame {
     @Override
     public List<Point> getLastAddedWord() {
         if (lastWordPoints == null) {
-            System.err.println("No game created");
+            System.err.println("No added last word");
         }
         return lastWordPoints;
     }
@@ -112,10 +117,25 @@ public class GameManager implements BoggleGame {
     // sets the board state and resets certain instance variables
     @Override
     public void setGame(char[][] board) {
+        if (board == null) {
+            System.err.println("invalid input");
+            return;
+        }
+
+        int height = board.length;
+
         // change all of board's characters to lowercase
         for (int i = 0; i < board.length; i++) {
-            for (int j = 0; j < board[0].length; j++) {
+            if (board[i].length != height) {
+                System.err.println("invalid inputted board dimensions");
+                return;
+            }
+            for (int j = 0; j < board[i].length; j++) {
                 board[i][j] = (String.valueOf(board[i][j]).toLowerCase()).charAt(0);
+                if (board[i][j] - 'a' < 0 || board[i][j] - 'z' > 0) {
+                    System.err.println("invalid board character");
+                    return;
+                }
             }
         }
 
@@ -309,7 +329,7 @@ public class GameManager implements BoggleGame {
     }
 
     // class that stores the current word, as well as the list of points and positions visited
-    private class WordPoints {
+    public class WordPoints {
         private String word;
         private List<Point> points;
         private boolean[][] visited;
@@ -318,7 +338,7 @@ public class GameManager implements BoggleGame {
             this.word = word;
             this.points = points;
 
-            this.visited = new boolean[size][size];
+            this.visited = new boolean[visited.length][visited[0].length];
             if (visited != null) {
                 // copy the previous visited array
                 for (int i = 0; i < visited.length; i++) {
