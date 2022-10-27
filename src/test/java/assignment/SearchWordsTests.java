@@ -18,6 +18,16 @@ public class SearchWordsTests {
 
     void testAddToQueue() {
         Queue<GameManager.WordPoints> queue = new LinkedList<>();
+        List<Point> list = new ArrayList<>();
+        int size = 4;
+        boolean[][] visited = new boolean[size][size];
+        int[][] points = new int[(int)(Math.random() * 100)][2];
+        for (int i = 0; i < points.length; i++) {
+            points[i][0] = (int)(Math.random() * 100);
+            points[i][1] = (int)(Math.random() * 100);
+        }
+
+        
     }
 
     @RepeatedTest(100)
