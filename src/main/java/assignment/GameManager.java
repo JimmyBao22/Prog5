@@ -27,10 +27,16 @@ public class GameManager implements BoggleGame {
         this.cubeFile = cubeFile;
         this.dict = dict;
         if (size <= 0) {
-            throw new IllegalArgumentException("size needs to be a positive integer");
+            System.err.println("size needs to be a positive integer");
+            return;
         }
-        if (numPlayers < 0) {
-            throw new IllegalArgumentException("number of players is less than 0");
+        if (numPlayers <= 0) {
+            System.err.println("number of players needs to be a positive integer");
+            return;
+        }
+        if (numPlayers > (int)(1e6)) {
+            System.err.println("too many players, please limit to under 1000000.");
+            return;
         }
 
         try {
@@ -49,7 +55,8 @@ public class GameManager implements BoggleGame {
                 for (int j = 0; j < cubeStrings[i].length(); j++) {
                     if (cubeStrings[i].charAt(j) - 'a' < 0 || cubeStrings[i].charAt(j) - 'z' > 0) {
                         // invalid character found
-                        throw new IllegalArgumentException("illegal cube character");
+                        System.err.println("illegal cube character");
+                        return;
                     }
                 }
             }
@@ -96,7 +103,7 @@ public class GameManager implements BoggleGame {
         }
 
         word = word.toLowerCase();
-        if (word.length() >= 4 && !usedWords.contains(word) && searchWord(word)) {
+        if (word.length() >= 4 && !usedWords.contains(word) && dict.contains(word) && searchWord(word)) {
             // found the word
             scores[player] += (word.length() - 3);
             usedWords.add(word);
@@ -168,7 +175,7 @@ public class GameManager implements BoggleGame {
         } else if (searchTactic.equals(SearchTactic.SEARCH_DICT)) {
             searchDict(words);
         } else {
-            throw new IllegalArgumentException("Invalid search tactic");
+            System.err.println("Invalid search tactic");
         }
 
         return words;
