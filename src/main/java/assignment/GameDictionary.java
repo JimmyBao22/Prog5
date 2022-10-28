@@ -43,6 +43,7 @@ public class GameDictionary implements BoggleDictionary {
     @Override
     public boolean isPrefix(String prefix) {
         prefix = prefix.toLowerCase();
+        prefix = prefix.trim();
         if (words == null) {
             System.err.println("No loaded dictionary");
             return false;
@@ -54,6 +55,7 @@ public class GameDictionary implements BoggleDictionary {
     @Override
     public boolean contains(String word) {
         word = word.toLowerCase();
+        word = word.trim();
         if (words == null) {
             System.err.println("No loaded dictionary");
             return false;
