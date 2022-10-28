@@ -265,7 +265,7 @@ public class GameManager implements BoggleGame {
     }
 
     // checks dictionary-driven search conditions
-    private int searchDictConditions(String currentWord, String desiredWord) {
+    public int searchDictConditions(String currentWord, String desiredWord) {
         if (currentWord.equals(desiredWord)) {
             // found the word
             return 0;
@@ -317,7 +317,7 @@ public class GameManager implements BoggleGame {
     }
 
     // adds this specific updated word and updated positions to the stack
-    public void addToStack(Stack<WordPoints> stack, List<Point> currentPoints, int updatedX, int updatedY, String updatedWord, boolean[][] visited) {
+    private void addToStack(Stack<WordPoints> stack, List<Point> currentPoints, int updatedX, int updatedY, String updatedWord, boolean[][] visited) {
         List<Point> updatedPoints = new ArrayList<Point>(currentPoints);
         updatedPoints.add(new Point(updatedX, updatedY));
         stack.add(new WordPoints(updatedWord, updatedPoints, visited));
@@ -329,7 +329,7 @@ public class GameManager implements BoggleGame {
     }
 
     // class that stores the current word, as well as the list of points and positions visited
-    public class WordPoints {
+    class WordPoints {
         private String word;
         private List<Point> points;
         private boolean[][] visited;
