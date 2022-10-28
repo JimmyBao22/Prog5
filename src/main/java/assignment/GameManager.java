@@ -283,6 +283,7 @@ public class GameManager implements BoggleGame {
             return 1;
         }
 
+        // the current word is a prefix of the desired word, continue searching
         return 2;
     }
 
