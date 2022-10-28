@@ -26,15 +26,18 @@ public class GameManager implements BoggleGame {
         this.numPlayers = numPlayers;
         this.cubeFile = cubeFile;
         this.dict = dict;
+
         if (size <= 0) {
             System.err.println("size needs to be a positive integer");
             return;
         }
+
         if (numPlayers <= 0) {
             System.err.println("number of players needs to be a positive integer");
             return;
         }
-        if (numPlayers > (int)(1e6)) {
+
+        if (numPlayers > 1000000) {
             System.err.println("too many players, please limit to under 1000000.");
             return;
         }
@@ -61,7 +64,7 @@ public class GameManager implements BoggleGame {
                 }
             }
         } catch (IOException e) {
-            System.err.println("Error reading instruction file: " + e.getMessage());
+            System.err.println("Error reading cube file: " + e.getMessage());
             return;
         }
 

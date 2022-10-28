@@ -1,25 +1,26 @@
 package assignment;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 public class GameDictionary implements BoggleDictionary {
-    private String fileName;
     private Trie words;
+
+    public GameDictionary() {
+        this.words = null;
+    }
 
     @Override
     public void loadDictionary(String filename) throws IOException {
-        fileName = filename;
         words = new Trie();
 
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(fileName));
+            BufferedReader reader = new BufferedReader(new FileReader(filename));
             String word = "";
+
             while ((word = reader.readLine()) != null) {
                 // remove excess whitespace and move to lowercase
                 word = word.trim();
@@ -37,14 +38,20 @@ public class GameDictionary implements BoggleDictionary {
                 words.add(word);
             }
         } catch(IOException e) {
-            System.err.println("Error reading instruction file: " + e.getMessage());
+            System.err.println("Error reading dictionary: " + e.getMessage());
         }
     }
 
     @Override
     public boolean isPrefix(String prefix) {
+        if (words == null) {
+            System.err.println("Dictionary must be loaded before checking for prefixes");
+            return false;
+        }
+
         prefix = prefix.toLowerCase();
         prefix = prefix.trim();
+
         if (words == null) {
             System.err.println("No loaded dictionary");
             return false;
@@ -55,8 +62,14 @@ public class GameDictionary implements BoggleDictionary {
 
     @Override
     public boolean contains(String word) {
+        if (words == null) {
+            System.err.println("Dictionary must be loaded before checking for contains");
+            return false;
+        }
+
         word = word.toLowerCase();
         word = word.trim();
+
         if (words == null) {
             System.err.println("No loaded dictionary");
             return false;
@@ -69,7 +82,7 @@ public class GameDictionary implements BoggleDictionary {
     public Iterator<String> iterator() {
         if (words == null) {
             System.err.println("No loaded dictionary");
-            return null;
+            return Collections.emptyIterator();
         }
 
         return words.iterator();

@@ -12,9 +12,9 @@ public class TestWeirdBoardsJar {
     public static void main(String[] args) throws IOException {
         BoggleGame game = new GameManager();
         BoggleDictionary dictionary = new GameDictionary();
-        dictionary.loadDictionary("/Users/jimmybao/CS/CS314H/prog5 testing/words.txt");
+        dictionary.loadDictionary("words.txt");
         int numPlayers = 2;
-        game.newGame(4, numPlayers, "/Users/jimmybao/CS/CS314H/prog5 testing/cubes.txt", dictionary);
+        game.newGame(4, numPlayers, "cubes.txt", dictionary);
 
         char[][] board = {{'E'}};
 

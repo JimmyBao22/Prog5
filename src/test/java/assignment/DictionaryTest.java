@@ -19,6 +19,7 @@ public class DictionaryTest {
         return ans.toString();
     }
 
+    // randomizes the case of each character in a string
     String randomizeCase(String in) {
         StringBuilder out = new StringBuilder();
         for (char c : in.toCharArray()) {
@@ -55,38 +56,26 @@ public class DictionaryTest {
         for (String currWord : dict) {
             traversedWords.add(currWord.toUpperCase());
             traversedOrderedWords.add(currWord.toUpperCase());
+
             Assertions.assertTrue(words.contains(currWord.toUpperCase()));
-//            System.out.print(currWord + " ");
             Assertions.assertTrue(orderedWords.get(ind).equals(currWord.toUpperCase()));
             ind++;
         }
-
-//        System.out.println(traversedOrderedWords);
-
 
         Assertions.assertEquals(traversedWords, words);
         Assertions.assertEquals(traversedOrderedWords, orderedWords);
 
         for (String currWord : words) {
-//            if (currWord.length() < 4) {
-//                continue;
-//            }
-//            currWord = currWord.toLowerCase();
-//            if (!dict.contains(currWord)) {
-//                System.out.print(currWord + " ");
-//            }
-//            Assertions.assertTrue(dict.contains(currWord.toUpperCase()));
-//            Assertions.assertTrue(dict.contains(randomizeCase(currWord)));
+            Assertions.assertTrue(dict.contains(currWord.toUpperCase()));
+            Assertions.assertTrue(dict.contains(randomizeCase(currWord)));
             Assertions.assertTrue(dict.contains(currWord.toLowerCase()));
 
             Assertions.assertTrue(dict.contains(currWord.toUpperCase()) || dict.contains(currWord.toLowerCase()));
             for (int i = 1; i <= currWord.length(); i++) {
                 String substr = currWord.substring(0, i);
-//                if (!dict.isPrefix(substr)) {
-//                    System.out.print("(" + currWord + ", " + substr + ") ");
-//                }
-//                Assertions.assertTrue(dict.isPrefix(substr.toUpperCase()));
-//                Assertions.assertTrue(dict.isPrefix(randomizeCase(substr)));
+
+                Assertions.assertTrue(dict.isPrefix(substr.toUpperCase()));
+                Assertions.assertTrue(dict.isPrefix(randomizeCase(substr)));
                 Assertions.assertTrue(dict.isPrefix(substr.toLowerCase()));
             }
         }
@@ -97,8 +86,8 @@ public class DictionaryTest {
                 testWord = makeRandomString();
             } while (words.contains(testWord));
 
-//            Assertions.assertFalse(dict.contains(testWord.toUpperCase()));
-//            Assertions.assertFalse(dict.contains(randomizeCase(testWord.toUpperCase())));
+            Assertions.assertFalse(dict.contains(testWord.toUpperCase()));
+            Assertions.assertFalse(dict.contains(randomizeCase(testWord.toUpperCase())));
             Assertions.assertFalse(dict.contains(testWord.toLowerCase()));
         }
     }

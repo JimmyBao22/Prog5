@@ -9,16 +9,15 @@ import java.util.List;
 import java.util.Set;
 
 public class TestAddingWordJar {
-
     public static void main(String[] args) throws IOException {
         BoggleDictionary dictionary = new GameDictionary();
-        dictionary.loadDictionary("/Users/jimmybao/CS/CS314H/prog5 testing/words.txt");
+        dictionary.loadDictionary("words.txt");
         BoggleGame game;
         for (int k = 0; k < 100; k++) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
             int numPlayers = 2;
             game = new GameManager();
-            game.newGame(4, numPlayers, "/Users/jimmybao/CS/CS314H/prog5 testing/cubes.txt", dictionary);
+            game.newGame(4, numPlayers, "cubes.txt", dictionary);
 
             char[][] board = {{'E', 'E', 'C', 'A'},
                     {'A', 'L', 'E', 'P'},

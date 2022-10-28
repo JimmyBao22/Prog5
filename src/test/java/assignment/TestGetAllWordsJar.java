@@ -11,9 +11,9 @@ public class TestGetAllWordsJar {
 
     public static void main(String[] args) throws IOException {
         BoggleDictionary dictionary = new GameDictionary();
-        dictionary.loadDictionary("/Users/jimmybao/CS/CS314H/prog5 testing/words.txt");
+        dictionary.loadDictionary("words.txt");
         BoggleGame game = new GameManager();
-        game.newGame(4, 2, "/Users/jimmybao/CS/CS314H/prog5 testing/cubes.txt", dictionary);
+        game.newGame(4, 2, "cubes.txt", dictionary);
 
         char[][] board = {{'E', 'E', 'C', 'A'},
                 {'A', 'L', 'E', 'P'},

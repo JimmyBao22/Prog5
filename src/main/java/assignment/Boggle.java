@@ -12,7 +12,6 @@ public class Boggle {
     private BoggleDictionary dict;
     private BufferedReader inputReader;
     private int currPlayer;
-    // TODO: we are duplicating this storage, can we find a workaround while using BoggleGame API
     private Set<String> guessedWords;
 
     // should only be constructed within this class
@@ -72,7 +71,6 @@ public class Boggle {
     }
 
     // display the board
-    // TODO precompute this string and just print it?
     private static void displayBoard(char[][] board) {
         int maxRowWidth = 0;
         for (char[] row : board) {
@@ -179,7 +177,7 @@ public class Boggle {
         System.out.println("Scores:");
         int[] scores = manager.getScores();
         for (int player = 0; player < scores.length; player++) {
-            System.out.println("Player " + player +  ": " + scores[player]);
+            System.out.println("Player " + (player+1) +  ": " + scores[player]);
         }
         System.out.println();
     }
