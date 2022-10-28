@@ -188,41 +188,41 @@ public class GameManager implements BoggleGame {
 
     // searches for a specific word in the board
     private boolean searchWord(String desiredWord) {
-        Queue<WordPoints> queue = new LinkedList<WordPoints>();
+        Stack<WordPoints> stack = new Stack<WordPoints>();
 
-        // push all the letters that match the first character of the word into the queue
+        // push all the letters that match the first character of the word into the stack
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 if (board[i][j] == desiredWord.charAt(0)) {
-                    addToQueue(queue, new ArrayList<Point>(), i, j, String.valueOf(board[i][j]), null);
+                    addToStack(stack, new ArrayList<Point>(), i, j, String.valueOf(board[i][j]), new boolean[size][size]);
                 }
             }
         }
 
-        return searchQueue(queue, null, desiredWord, false);
+        return searchStack(stack, null, desiredWord, false);
     }
 
     // board-driven search that recursively search the board for words beginning at each square on the board
     private void searchBoard(Collection<String> words) {
-        Queue<WordPoints> queue = new LinkedList<WordPoints>();
+        Stack<WordPoints> stack = new Stack<WordPoints>();
 
-        // push every letter in the board into the queue
+        // push every letter in the board into the stack
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
-                addToQueue(queue, new ArrayList<Point>(), i, j, String.valueOf(board[i][j]), null);
+                addToStack(stack, new ArrayList<Point>(), i, j, String.valueOf(board[i][j]), new boolean[size][size]);
             }
         }
 
         // since we are searching for all words, there is no specific desired word
-        searchQueue(queue, words, "", true);
+        searchStack(stack, words, "", true);
     }
 
     // searches the board for either a specific word, or for all words (depending on whether this function
     // was called from searchWord or searchBoard (uses a boolean to keep track of which))
-    private boolean searchQueue(Queue<WordPoints> queue, Collection<String> words, String desiredWord, boolean searchBoard) {
-        // while there are still elements in the queue, continue to search for words
-        while (!queue.isEmpty()) {
-            WordPoints current = queue.poll();
+    private boolean searchStack(Stack<WordPoints> stack, Collection<String> words, String desiredWord, boolean searchBoard) {
+        // while there are still elements in the stack, continue to search for words
+        while (!stack.isEmpty()) {
+            WordPoints current = stack.pop();
             String currentWord = current.getWord();
             List<Point> currentPoints = current.getPoints();
             Point previousPosition = currentPoints.get(currentPoints.size() - 1);
@@ -257,8 +257,8 @@ public class GameManager implements BoggleGame {
                 }
             }
 
-            // update the queue by appending characters around the current position to the current word
-            updateQueue(queue, currentWord, currentPoints, x, y, visited);
+            // update the stack by appending characters around the current position to the current word
+            updateStack(stack, currentWord, currentPoints, x, y, visited);
         }
 
         return false;
@@ -301,8 +301,8 @@ public class GameManager implements BoggleGame {
         return 2;
     }
 
-    // updates the queue by attempting to go in all directions and appending to the current word based on the current position
-    private void updateQueue(Queue<WordPoints> queue, String currentWord, List<Point> currentPoints, int x, int y, boolean[][] visited) {
+    // updates the stack by attempting to go in all directions and appending to the current word based on the current position
+    private void updateStack(Stack<WordPoints> stack, String currentWord, List<Point> currentPoints, int x, int y, boolean[][] visited) {
         // attempts go in all directions
         int[][] delta = new int[][] {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {-1, -1}, {1, -1}, {-1, 1}};
         for (int i = 0; i < delta.length; i++) {
@@ -311,16 +311,16 @@ public class GameManager implements BoggleGame {
 
             if (!outOfBounds(updatedX, updatedY)) {
                 String updatedWord = currentWord + board[updatedX][updatedY];
-                addToQueue(queue, currentPoints, updatedX, updatedY, updatedWord, visited);
+                addToStack(stack, currentPoints, updatedX, updatedY, updatedWord, visited);
             }
         }
     }
 
-    // adds this specific updated word and updated positions to the queue
-    private void addToQueue(Queue<WordPoints> queue, List<Point> currentPoints, int updatedX, int updatedY, String updatedWord, boolean[][] visited) {
+    // adds this specific updated word and updated positions to the stack
+    public void addToStack(Stack<WordPoints> stack, List<Point> currentPoints, int updatedX, int updatedY, String updatedWord, boolean[][] visited) {
         List<Point> updatedPoints = new ArrayList<Point>(currentPoints);
         updatedPoints.add(new Point(updatedX, updatedY));
-        queue.add(new WordPoints(updatedWord, updatedPoints, visited));
+        stack.add(new WordPoints(updatedWord, updatedPoints, visited));
     }
 
     // checks if the given position is out of bounds of the board

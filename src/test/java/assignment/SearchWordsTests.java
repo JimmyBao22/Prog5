@@ -5,10 +5,9 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
+import java.io.IOException;
+import java.util.*;
 import java.util.List;
-import java.util.Queue;
 
 public class SearchWordsTests {
 
@@ -16,30 +15,67 @@ public class SearchWordsTests {
 
     }
 
-    void testAddToQueue() {
-        Queue<GameManager.WordPoints> queue = new LinkedList<>();
+    void testUpdateStack() throws IOException {
+        BoggleGame game = new GameManager();
+        BoggleDictionary dictionary = new GameDictionary();
+        dictionary.loadDictionary("words.txt");
+        int numPlayers = 2;
+        game.newGame(4, numPlayers, "cubes.txt", dictionary);
+    }
+
+    @RepeatedTest(100)
+    void testAddToStack() {
+        GameManager g = new GameManager();
+        Stack<GameManager.WordPoints> stack = new Stack<>();
         List<Point> list = new ArrayList<>();
         int size = 4;
         boolean[][] visited = new boolean[size][size];
-        int[][] points = new int[(int)(Math.random() * 100)][2];
-        for (int i = 0; i < points.length; i++) {
-            points[i][0] = (int)(Math.random() * 100);
-            points[i][1] = (int)(Math.random() * 100);
+//        int[][] oldPoints = new int[(int)(Math.random() * 100)][2];
+//        for (int i = 0; i < oldPoints.length; i++) {
+//            oldPoints[i][0] = (int)(Math.random() * 100);
+//            oldPoints[i][1] = (int)(Math.random() * 100);
+//            list.add(new Point(oldPoints[i][0], oldPoints[i][1]));
+//        }
+        int[][] newPoints = new int[(int)(Math.random() * 100)][2];
+        for (int i = 0; i < newPoints.length; i++) {
+            newPoints[i][0] = (int)(Math.random() * 100);
+            newPoints[i][1] = (int)(Math.random() * 100);
         }
 
-        
+//        for (int i = 0; i < size; i++) {
+//            for (int j = 0; j < size; j++) {
+//                if (Math.random() < 0.5) visited[i][j] = true;
+//            }
+//        }
+
+        String word = "";
+
+        for (int i = 0; i < newPoints.length; i++) {
+            // add something random to word
+            word += (char)((int)(Math.random() * 26) + 'a');
+            g.addToStack(stack, list, newPoints[i][0], newPoints[i][1], word, visited);
+            list.add(new Point(newPoints[i][0], newPoints[i][1]));
+        }
+
+        Assertions.assertEquals(newPoints.length, stack.size());
+
+        for (int i = 0; i < newPoints.length; i++) {
+            GameManager.WordPoints wordPoints = stack.pop();
+            String actualWord = wordPoints.getWord();
+            Assertions.assertEquals(word.substring(0, actualWord.length()), actualWord);
+            Assertions.assertEquals(newPoints.length - i, wordPoints.getPoints().size());
+
+            for (int j = 0; j < wordPoints.getPoints().size(); j++) {
+                Assertions.assertEquals(newPoints[j][0], wordPoints.getPoints().get(j).getX());
+                Assertions.assertEquals(newPoints[j][1], wordPoints.getPoints().get(j).getY());
+            }
+        }
     }
 
     @RepeatedTest(100)
     void testWordPointsClass() {
         /*
-
-        int length = (int)(Math.random() * 1000);
-        String word = "";
-        for (int i = 0; i < length; i++) {
-            word += (char)((int)(Math.random() * 26) + 'a');
-        }
-        System.out.println(word);
+        String word = generateWord();
 
         List<Point> list = new ArrayList<Point>();
         int listSize = (int)(Math.random() * 100);
@@ -83,7 +119,15 @@ public class SearchWordsTests {
                 }
             }
         }
-
          */
+    }
+
+    String generateWord() {
+        int length = (int)(Math.random() * 1000);
+        String word = "";
+        for (int i = 0; i < length; i++) {
+            word += (char)((int)(Math.random() * 26) + 'a');
+        }
+        return word;
     }
 }
