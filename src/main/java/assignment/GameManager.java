@@ -329,7 +329,7 @@ public class GameManager implements BoggleGame {
     }
 
     // class that stores the current word, as well as the list of points and positions visited
-    class WordPoints {
+    private class WordPoints {
         private String word;
         private List<Point> points;
         private boolean[][] visited;
