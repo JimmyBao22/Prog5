@@ -185,7 +185,8 @@ public class DefaultBoardTests {
         Assertions.assertEquals(null, game.getLastAddedWord());
     }
 
-    // tests weird words with capitalizations and stuff
+    // tests weird words with both lower and uppercase. tests that the game adds the word correctly, the scores calculated
+    // are correct, and the getlastword returns the right points
     @RepeatedTest(100)
     void testWeirdWords() throws IOException {
         BoggleGame game = new GameManager();
@@ -250,6 +251,7 @@ public class DefaultBoardTests {
         }
     }
 
+    // 1x1, uneven boards (not square), board w/ both upper and lower case
     @Test
     void testWeirdBoards() throws IOException {
         BoggleGame game = new GameManager();

@@ -265,7 +265,7 @@ public class GameManager implements BoggleGame {
     }
 
     // checks dictionary-driven search conditions
-    public int searchDictConditions(String currentWord, String desiredWord) {
+    private int searchDictConditions(String currentWord, String desiredWord) {
         if (currentWord.equals(desiredWord)) {
             // found the word
             return 0;

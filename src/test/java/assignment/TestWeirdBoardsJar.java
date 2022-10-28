@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class testWeirdBoardsJar {
+public class TestWeirdBoardsJar {
 
     public static void main(String[] args) throws IOException {
         BoggleGame game = new GameManager();
