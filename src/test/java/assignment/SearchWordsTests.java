@@ -370,6 +370,28 @@ public class SearchWordsTests {
          */
     }
 
+    @Test
+    void testSearchStack() throws IOException {
+        /*
+        GameManager game = new GameManager();
+        BoggleDictionary dictionary = new GameDictionary();
+        dictionary.loadDictionary("words.txt");
+        int numPlayers = 2;
+        int size = 2;
+        game.newGame(size, numPlayers, "cubes.txt", dictionary);
+
+        char[][] board = {{'E', 'H'}, {'A', 'T'}};
+
+        game.setGame(board);
+
+        game.searchBoard(new HashSet<>());
+
+        System.out.println("NEW TACTIC");
+
+        game.searchWord("hi");
+         */
+    }
+
     String generateWord() {
         int length = (int)(Math.random() * 1000);
         String word = "";
