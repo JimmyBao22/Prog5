@@ -19,6 +19,24 @@ public class DefaultBoardTests {
         // note: this uses the default board given in the example in the pdf, useful for testing
     }
 
+    @Test
+    void testest() throws IOException {
+        BoggleGame game = new GameManager();
+        BoggleDictionary dictionary = new GameDictionary();
+        dictionary.loadDictionary("words.txt");
+        game.newGame(4, 2, "cubes.txt", dictionary);
+
+        char[][] board = {{'t', 'o', 'p', 'y'},
+                {'n', 'v', 'o', 't'},
+                {'i', 'r', 'i', 'n'},
+                {'t', 't', 'd', 'u'}};
+
+        game.setGame(board);
+
+        game.addWord("topytovnirinudtt", 0);
+        System.out.println(Arrays.toString(game.getScores()));
+    }
+
     // tests add word, get score (score array), and get last word
     @RepeatedTest(100)
     void testAddingWords() throws IOException {
@@ -185,7 +203,8 @@ public class DefaultBoardTests {
         Assertions.assertEquals(null, game.getLastAddedWord());
     }
 
-    // tests weird words with capitalizations and stuff
+    // tests weird words with both lower and uppercase. tests that the game adds the word correctly, the scores calculated
+    // are correct, and the getlastword returns the right points
     @RepeatedTest(100)
     void testWeirdWords() throws IOException {
         BoggleGame game = new GameManager();
@@ -250,6 +269,7 @@ public class DefaultBoardTests {
         }
     }
 
+    // 1x1, uneven boards (not square), board w/ both upper and lower case
     @Test
     void testWeirdBoards() throws IOException {
         BoggleGame game = new GameManager();

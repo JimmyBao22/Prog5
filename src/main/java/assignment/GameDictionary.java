@@ -29,7 +29,8 @@ public class GameDictionary implements BoggleDictionary {
                 for (int j = 0; j < word.length(); j++) {
                     if (word.charAt(j) - 'a' < 0 || word.charAt(j) - 'z' > 0) {
                         // invalid character found
-                        throw new IllegalArgumentException("illegal word character");
+                        System.err.println("illegal character in dictionary");
+                        return;
                     }
                 }
 
@@ -43,6 +44,7 @@ public class GameDictionary implements BoggleDictionary {
     @Override
     public boolean isPrefix(String prefix) {
         prefix = prefix.toLowerCase();
+        prefix = prefix.trim();
         if (words == null) {
             System.err.println("No loaded dictionary");
             return false;
@@ -54,6 +56,7 @@ public class GameDictionary implements BoggleDictionary {
     @Override
     public boolean contains(String word) {
         word = word.toLowerCase();
+        word = word.trim();
         if (words == null) {
             System.err.println("No loaded dictionary");
             return false;
