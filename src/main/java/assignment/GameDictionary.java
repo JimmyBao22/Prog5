@@ -52,11 +52,6 @@ public class GameDictionary implements BoggleDictionary {
         prefix = prefix.toLowerCase();
         prefix = prefix.trim();
 
-        if (words == null) {
-            System.err.println("No loaded dictionary");
-            return false;
-        }
-
         return words.hasPrefix(prefix);
     }
 
@@ -69,11 +64,6 @@ public class GameDictionary implements BoggleDictionary {
 
         word = word.toLowerCase();
         word = word.trim();
-
-        if (words == null) {
-            System.err.println("No loaded dictionary");
-            return false;
-        }
 
         return words.contains(word);
     }
