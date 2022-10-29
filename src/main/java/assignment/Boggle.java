@@ -128,6 +128,8 @@ public class Boggle {
                 System.out.println("The guessed word must be at least 4 letters.");
             } else if (guessedWords.contains(userWord)) {
                 System.out.println("The guessed word has already been used.");
+            } else if (!dict.contains(userWord)) {
+                System.out.println("The guessed word is not in the dictionary.");
             } else {
                 // the word must not be on the board
                 System.out.println("The guessed word is not on the board.");
