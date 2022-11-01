@@ -1,6 +1,6 @@
-# Boggle-Game
+# Word-Hunt
 
-A variant of Word Hunt: a word game played with random letters arranged in a square grid. 
+A word game played with random letters arranged in a square grid (aka Boggle).
 
 The object of the game is to identify—in this grid of letters—words that satisfy the following conditions:
 - The word must be at least four letters long.
